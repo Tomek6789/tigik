@@ -26,3 +26,14 @@ Before running the tests make sure you are serving the app via `ng serve`.
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+
+
+To Do:
+
+1. [DONE] Game levels
+2. [DONE] Best score.
+3. [DONE] Reset timer after good answer
+4. [DONE] Max level issue
+5. Dobre polozenie pierwiastkow w ukladzie
+6. Zapisywanie wynikow w bazie firebase. Struktura: Users = { email: { name: name, score: 400 }, email: { name: name, score 300 }}
+7. Introduce yourself - Login and Email  Signin should save in firebase email: { name: name, score: 0 }
