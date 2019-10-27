@@ -1,4 +1,19 @@
 .periodicTable {
-    width: 1000px;
-    margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(18, 1fr);
+  grid-template-rows: repeat(11, 1fr);
+}
+
+.element-first {
+  grid-column: 2/18;
+}
+
+.element-metals {
+  grid-column: 3/13;
+  grid-row: 2/4;
+}
+
+.element-Fr {
+  grid-column: 4/19;
+  grid-row: 11;
 }

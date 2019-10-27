@@ -1,9 +1,7 @@
 .box {
-    width: 50px;
-    height: 50px;
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .border {
-    border: 1px solid blueviolet;    
+  border: 1px solid blueviolet;
 }

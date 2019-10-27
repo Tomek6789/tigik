@@ -1,12 +1,10 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { DatastorageService } from "./data-storage/datastorage.service";
 import { PeriodicTableService } from "./periodic-table.service";
 import { Element } from "./models/element";
 import { FindComponent } from "./find/find.component";
 import { ScoreComponent } from "./score/score.component";
 import { BehaviorSubject, Subject } from "rxjs/Rx";
-
-import { ElementComponent } from "./element/element.component";
 
 @Component({
   selector: "app-root",
@@ -16,41 +14,23 @@ import { ElementComponent } from "./element/element.component";
 export class AppComponent implements OnInit {
   table: Element[];
   symbol: string;
-  _start = false;
-  bestScore = 0;
-  _score = 0;
-  // correct answare should check level and reset timer;
+
+  state = {
+    start: false,
+    bestScore: 0,
+    score: 0
+  };
+
   level$ = new BehaviorSubject("One");
   reset$ = new Subject();
 
-  @ViewChild(FindComponent) findComponent: FindComponent;
-  @ViewChild(ScoreComponent) scoreComponent: ScoreComponent;
+  @ViewChild(FindComponent, { static: false }) findComponent: FindComponent;
+  @ViewChild(ScoreComponent, { static: false }) scoreComponent: ScoreComponent;
 
   constructor(
     private periodicTableService: PeriodicTableService,
     private dataStorage: DatastorageService
   ) {}
-
-  ngAfterViewInit() {}
-
-  get score() {
-    return this._score;
-  }
-  set score(val: number) {
-    this._score = val;
-    if (this._score >= this.bestScore) {
-      this.bestScore = this._score;
-    }
-  }
-
-  get start() {
-    return this._start;
-  }
-  set start(val: boolean) {
-    this._start = val;
-    this.score = 0;
-    console.log("lol");
-  }
 
   storeToDB() {
     // this.dataStorage.saveScore()
@@ -60,7 +40,8 @@ export class AppComponent implements OnInit {
   }
 
   handleFinish(finish) {
-    this.start = finish;
+    this.state.start = finish;
+    this.state.score = 0;
   }
 
   ngOnInit() {
@@ -84,7 +65,7 @@ export class AppComponent implements OnInit {
   }
 
   startGame() {
-    this.start = true;
+    this.state.start = true;
     this.reset$.next(true);
   }
 }

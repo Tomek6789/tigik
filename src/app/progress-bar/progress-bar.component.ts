@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from "@angular/core";
 import { Observable } from "rxjs/Rx";
-import { TimerObservable } from "rxjs/observable/TimerObservable";
+import { timer } from "rxjs";
+import { take, tap } from "rxjs/operators";
 
 @Component({
   selector: "app-progress-bar",
@@ -16,14 +17,15 @@ export class ProgressBarComponent implements OnInit {
   @Output() finish: EventEmitter<boolean> = new EventEmitter();
 
   ngOnInit() {
-    let timer$ = TimerObservable.create(0, 10)
-      .take(101)
-      .map(x => {
+    let timer$ = timer(0, 100).pipe(
+      take(101),
+      tap(x => {
         if (x === 100) {
           this.finish.emit(false);
         }
-        return x;
-      });
+      })
+    );
+
     this.value$ = this.reset$.switchMap(() => timer$);
   }
 }

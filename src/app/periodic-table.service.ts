@@ -1,16 +1,14 @@
-import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import {Observable} from 'rxjs/Rx';
+import { Injectable } from "@angular/core";
+import { Observable } from "rxjs/Rx";
+import { HttpClient } from "@angular/common/http";
 
 @Injectable()
 export class PeriodicTableService {
-
-  constructor(private http: Http) { }
+  constructor(private http: HttpClient) {}
 
   public getPeriodicTable() {
-    return this.http.get("../assets/periodicTable/periodicTable.json")
-      .map((res: Response) => res.json())
-      .catch((error: any) => Observable.throw(error))
+    return this.http
+      .get("../assets/periodicTable.json")
+      .catch((error: any) => Observable.throw(error));
   }
-
 }

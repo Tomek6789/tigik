@@ -4,17 +4,17 @@
     Welcome to {{ title }}!!
     {{ symbol }}
   </h1>
-  <button type="button" (click)="startGame()">
-    {{ start ? "START GAME" : "TRY AGAIN" }}
+  <button *ngIf="!state.start" type="button" (click)="startGame()">
+    {{ state.start ? "START GAME" : "TRY AGAIN" }}
   </button>
 </div>
 
-<p>YOUR THE BEST SCORE IS: {{ bestScore }}</p>
+<p>YOUR THE BEST SCORE IS: {{ state.bestScore }}</p>
 
 <div class="periodicTable">
   <app-element
     *ngFor="let element of table"
-    style="display: inline-block"
+    class="{{ 'element-' + element.symbol }}"
     [element]="element"
     (selected)="handleSelected($event)"
   >
@@ -23,8 +23,8 @@
 
 <!-- <button (click)="storeToDB()">Store to DB</button> -->
 
-<div *ngIf="start">
-  <app-score [(counter)]="score"></app-score>
+<div *ngIf="state.start">
+  <app-score [(counter)]="state.score"></app-score>
   <app-find [level$]="level$"></app-find>
   <app-progress-bar
     (finish)="handleFinish($event)"

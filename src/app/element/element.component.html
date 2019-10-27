@@ -1,7 +1,4 @@
-<div 
-  [ngClass]="{'border': element.symbol !== 'FRS', 'box': true}" 
-  (click)="handleClick(element.symbol)"
->
+<div class="border box" (click)="handleClick(element.symbol)">
   <div>
     {{ element.symbol }}
   </div>
