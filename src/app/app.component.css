@@ -27,7 +27,8 @@ button {
   box-shadow: 0 0 0 3px white, 0 0 0 6px #03a9f4;
 }
 button:hover {
-  animation: animate 12s linear infinite;
+  color: red;
+  animation: animate 8s linear infinite;
   font-size: 20px;
   box-shadow: 0 0 0 4px white, 0 0 0 8px #f441a5;
 
