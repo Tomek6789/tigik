@@ -26,9 +26,7 @@
     "electronegativity_pauling": 2.2,
     "ionization_energies": [1312.0]
   },
-  {
-    "symbol": "first"
-  },
+  
   {
     "name": "Helium",
     "appearance": "colorless gas, exhibiting a red-orange glow when placed in a high-voltage electric field",
@@ -110,9 +108,8 @@
     "electronegativity_pauling": 1.57,
     "ionization_energies": [899.5, 1757.1, 14848.7, 21006.6]
   },
-  {
-    "symbol": "metals"
-  },
+  
+  
   {
     "name": "Boron",
     "appearance": "black-brown",
@@ -3747,32 +3744,6 @@
     "electron_affinity": 5.40318,
     "electronegativity_pauling": null,
     "ionization_energies": []
-  },
-  {
-    "name": "Ununennium",
-    "appearance": null,
-    "atomic_mass": 315,
-    "boil": 630,
-    "category": "unknown, but predicted to be an alkali metal",
-    "color": null,
-    "density": 3,
-    "discovered_by": "GSI Helmholtz Centre for Heavy Ion Research",
-    "melt": null,
-    "molar_heat": null,
-    "named_by": null,
-    "number": 119,
-    "period": 8,
-    "phase": "Solid",
-    "source": "https://en.wikipedia.org/wiki/Ununennium",
-    "spectral_img": null,
-    "summary": "Ununennium, also known as eka-francium or simply element 119, is the hypothetical chemical element with symbol Uue and atomic number 119. Ununennium and Uue are the temporary systematic IUPAC name and symbol respectively, until a permanent name is decided upon. In the periodic table of the elements, it is expected to be an s-block element, an alkali metal, and the first element in the eighth period.",
-    "symbol": "Uue",
-    "xpos": 1,
-    "ypos": 8,
-    "shells": [2, 8, 18, 32, 32, 18, 8, 1],
-    "electron_configuration": "1s2 2s2 2p6 3s2 3p6 3d10 4s2 4p6 4d10 4f14 5s2 5p6 5d10 5f14 6s2 6p6 6d10 7s2 7p6 8s1",
-    "electron_affinity": 63.87,
-    "electronegativity_pauling": null,
-    "ionization_energies": []
   }
+ 
 ]
