@@ -13,8 +13,10 @@ body {
   font-size: 18px;
   line-height: 6vh;
 }
-.border:hover {
-  border: 4px solid #777;
+.box:hover {
+  color: red;
+  font-size: 21px;
+  background: linear-gradient(90deg, #03a9f4, #f441a5, #ffeb3b, #03a9f4);
 }
 
 
