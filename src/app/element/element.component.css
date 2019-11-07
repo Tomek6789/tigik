@@ -2,30 +2,32 @@ body {
   margin: 0;
   padding: 0;
   height: 100vh;
-
 }
 .box {
   box-sizing: border-box;
   font-weight: bold;
   text-align: center;
- border: 1px solid #777;
+  border: 1px solid #777;
   height: 6vh;
-  font-size: 18px;
   line-height: 6vh;
+  font-size: 18px;
+  transition: 0.5s linear;
 }
 .box:hover {
-  animation: show 5s linear infinite;
   color: red;
-  font-size: 21px;
- background-size: 400%;
-  background: linear-gradient(90deg, #03a9f4, #f441a5, #ffeb3b, #03a9f4);
+  font-size: 24px;
+  background-color: lightskyblue;
+  border: 3px solid #777;
+  cursor: pointer;
 }
-@keyframes show {
-  0% {
-    background-size: 0;
-  }
-  100% {
-    background-size: 400%;
+ @media (max-width: 840px) {
+  .box {
+      font-size: 12px;
+    }
+}
+@media (max-width: 840px) {
+  .box:hover {
+    font-size: 14px;
   }
 }
 
