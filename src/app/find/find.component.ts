@@ -27,7 +27,6 @@ export class FindComponent implements OnInit, OnDestroy {
       if (this.level !== level) {
         this.level = level;
         this.table = this.table.concat(Test[this.level]);
-        console.log(this.table);
       }
       this.findElement();
     });

@@ -14,8 +14,6 @@ export class DatastorageService {
   }
 
   getScore() {
-    return this.http.get(
-      "https://tigik-8d88c.firebaseio.com/users/tester.json"
-    );
+    return this.http.get("https://tigik-8d88c.firebaseio.com/users/tomek.json");
   }
 }

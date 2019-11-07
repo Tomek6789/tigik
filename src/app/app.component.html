@@ -1,24 +1,20 @@
 <!--The content below is only a placeholder and can be replaced.-->
 <div class="text">
-  <h1>
-    Welcome to
-  </h1>
   <button *ngIf="!state.start" type="button" (click)="startGame()">
-    {{ state.start ? "START GAME" : "TRY AGAIN" }}
+    Start Game
   </button>
 </div>
 <div *ngIf="state.start">
-    <app-score [(counter)]="state.score"></app-score>
-    
-    <app-progress-bar
-      (finish)="handleFinish($event)"
-      [reset$]="level$"
-    ></app-progress-bar>
-  </div>
+  <app-score [(counter)]="state.score"></app-score>
+  <app-progress-bar
+    (finish)="handleFinish($event)"
+    [reset$]="level$"
+  ></app-progress-bar>
+</div>
 <p>YOUR THE BEST SCORE IS: {{ state.bestScore }}</p>
 
 <div class="periodicTable">
-    <app-find class="find" [level$]="level$"></app-find>
+  <app-find *ngIf="state.start" class="find" [level$]="level$"></app-find>
   <app-element
     *ngFor="let element of table"
     class="{{ 'element-' + element.symbol }}"
@@ -27,10 +23,6 @@
   >
   </app-element>
   <span></span>
-
 </div>
 
-
-<!-- <button (click)="storeToDB()">Store to DB</button> -->
-
-
+<button (click)="storeToDB()">Store to DB</button>

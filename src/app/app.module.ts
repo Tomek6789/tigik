@@ -10,6 +10,8 @@ import { PeriodicTableService } from "./periodic-table.service";
 import { ProgressBarComponent } from "./progress-bar/progress-bar.component";
 import { ScoreComponent } from "./score/score.component";
 import { FindComponent } from "./find/find.component";
+import { CommonModule } from "@angular/common";
+import { PortalModule } from "@angular/cdk/portal";
 
 @NgModule({
   declarations: [
@@ -23,9 +25,12 @@ import { FindComponent } from "./find/find.component";
     BrowserModule,
     HttpClientModule,
     MatProgressBarModule,
-    MatTabsModule
+    MatTabsModule,
+    CommonModule,
+    PortalModule
   ],
   providers: [PeriodicTableService, DatastorageService],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [FindComponent]
 })
 export class AppModule {}

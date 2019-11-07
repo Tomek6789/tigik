@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
+import { BehaviorSubject, Subject } from "rxjs/Rx";
 import { DatastorageService } from "./data-storage/datastorage.service";
 import { PeriodicTableService } from "./periodic-table.service";
 import { Element } from "./models/element";
 import { FindComponent } from "./find/find.component";
 import { ScoreComponent } from "./score/score.component";
-import { BehaviorSubject, Subject } from "rxjs/Rx";
 
 @Component({
   selector: "app-root",
@@ -33,14 +33,16 @@ export class AppComponent implements OnInit {
   ) {}
 
   storeToDB() {
-    // this.dataStorage.saveScore()
-    // .subscribe((data: any) => {
-    //   console.log(data)
-    // });
+    this.dataStorage.saveScore().subscribe((data: any) => {
+      console.log(data);
+    });
   }
 
   handleFinish(finish) {
     this.state.start = finish;
+    if (this.state.score >= this.state.bestScore) {
+      this.state.bestScore = this.state.score;
+    }
     this.state.score = 0;
   }
 
@@ -52,7 +54,7 @@ export class AppComponent implements OnInit {
       });
 
     this.dataStorage.getScore().subscribe(data => {
-      console.log(data);
+      console.log("getSCORE", data);
     });
   }
 
