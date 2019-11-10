@@ -1,25 +1,26 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { FindComponent } from './find.component';
+import { FindComponent } from "./find.component";
+import { of } from "rxjs";
 
-describe('FindComponent', () => {
+describe("FindComponent", () => {
   let component: FindComponent;
   let fixture: ComponentFixture<FindComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FindComponent ]
-    })
-    .compileComponents();
+      declarations: [FindComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(FindComponent);
     component = fixture.componentInstance;
+    component.level$ = of("a");
     fixture.detectChanges();
   });
 
-  it('should be created', () => {
+  it("should be created", () => {
     expect(component).toBeTruthy();
   });
 });

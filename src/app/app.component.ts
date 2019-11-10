@@ -28,9 +28,9 @@ export class AppComponent implements OnInit {
   @ViewChild(ScoreComponent, { static: false }) scoreComponent: ScoreComponent;
 
   constructor(
-    private periodicTableService: PeriodicTableService,
-    private dataStorage: DatastorageService
-  ) {}
+    private periodicTableService: PeriodicTableService
+  ) // private dataStorage: DatastorageService
+  {}
 
   storeToDB() {
     // this.dataStorage.saveScore().subscribe((data: any) => {

@@ -12,7 +12,7 @@
     "experimentalDecorators": true,
     "target": "es2015",
     "typeRoots": ["node_modules/@types"],
-    "types": ["cypress"],
+    "types": ["jasmine"],
     "lib": ["es2016", "dom"],
     "module": "esnext"
   }
