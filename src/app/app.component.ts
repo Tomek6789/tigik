@@ -33,9 +33,9 @@ export class AppComponent implements OnInit {
   ) {}
 
   storeToDB() {
-    this.dataStorage.saveScore().subscribe((data: any) => {
-      console.log(data);
-    });
+    // this.dataStorage.saveScore().subscribe((data: any) => {
+    // console.log(data);
+    // });
   }
 
   handleFinish(finish) {
@@ -53,9 +53,9 @@ export class AppComponent implements OnInit {
         this.table = data;
       });
 
-    this.dataStorage.getScore().subscribe(data => {
-      console.log("getSCORE", data);
-    });
+    // this.dataStorage.getScore().subscribe(data => {
+    // console.log("getSCORE", data);
+    // });
   }
 
   handleSelected(symbol: string) {

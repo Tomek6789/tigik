@@ -15,7 +15,6 @@ export class ScoreComponent {
   }
 
   set counter(val) {
-    console.log("set caounter", val);
     this.counterValue = val;
     this.counterChange.emit(this.counterValue);
   }
