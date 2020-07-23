@@ -1,20 +1,89 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div class="text">
-  <button *ngIf="!state.start" type="button" (click)="startGame()">
-    Start Game
+<p>LOGIN</p>
+<app-user-profile></app-user-profile>
+<hr />
+
+<div class="visitor">
+  <p>Play as guest</p>
+  <button
+    class="btn"
+    *ngIf="!(userData$ | async)?.isVisitor"
+    (click)="playAsVisitor()"
+  >
+    Play as guest
+  </button>
+  <p>TUTAJ {{ (userData$ | async)?.isVisitor }}</p>
+</div>
+
+<p>Dostepne pokoje</p>
+<div *ngFor="let room of rooms$ | async" class="players">
+  <button class="btn" (click)="removeRoom(room.key)">Delete room</button>
+  <mat-card
+    *ngIf="room.hostUser"
+    class="hostUser"
+    [class.isPlaying]="showActive | async"
+  >
+    <mat-card-title>{{ room.hostUser.displayName }}</mat-card-title>
+    <mat-card-subtitle
+      >Best score: {{ room.hostUser.bestScore }}</mat-card-subtitle
+    >
+  </mat-card>
+  <mat-card
+    *ngIf="room.guestUser"
+    class="hostUser"
+    [class.isPlaying]="!showActive | async"
+  >
+    <mat-card-title>{{ room.guestUser.displayName }}</mat-card-title>
+    <mat-card-subtitle
+      >Best score:{{ room.guestUser.bestScore }}</mat-card-subtitle
+    >
+  </mat-card>
+
+  <button mat-raised-button color="primary" (click)="joinRoom(room.key)">
+    Join ROOM
+  </button>
+  <button mat-raised-button color="primary" (click)="invitePlayer(room.key)">
+    Invite player
   </button>
 </div>
-<div *ngIf="state.start">
-  <app-score [(counter)]="state.score"></app-score>
+
+<hr />
+
+<div class="text" style="display: flex;">
+  <button
+    *ngIf="!(myRoom$ | async)?.startGame"
+    type="button"
+    (click)="startGame()"
+    class="btn"
+  >
+    Start Game
+  </button>
+  <button (click)="storeToDB()" class="btn">Store to DB</button>
+  <button (click)="createRoom()" class="btn">Create Room</button>
+</div>
+
+<hr />
+
+<p>TUTAJ {{ (userData$ | async)?.bestScore }}</p>
+<p>Wybrany pierwiastek {{ (userData$ | async)?.elementSelected }}</p>
+
+<p>START GAME {{ (myRoom$ | async)?.startGame }}</p>
+
+<div *ngIf="(myRoom$ | async)?.startGame">
+  <app-score [points]="state.score"></app-score>
   <app-progress-bar
     (finish)="handleFinish($event)"
     [reset$]="level$"
   ></app-progress-bar>
 </div>
 <p>YOUR THE BEST SCORE IS: {{ state.bestScore }}</p>
-
+<!-- [class.isNotPlaying]="isPlaying | async" -->
 <div class="periodicTable">
-  <app-find *ngIf="state.start" class="find" [level$]="level$"></app-find>
+  <ng-container *ngIf="(myRoom$ | async)?.startGame">
+    <app-find
+      class="find"
+      [searchingElement]="(myRoom$ | async)?.searchingElement"
+    ></app-find>
+  </ng-container>
   <app-element
     *ngFor="let element of table"
     class="{{ 'element-' + element.symbol }}"
@@ -24,5 +93,3 @@
   </app-element>
   <span></span>
 </div>
-
-<!-- <button (click)="storeToDB()">Store to DB</button> -->

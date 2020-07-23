@@ -1,3 +1,16 @@
+.players {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.isNotPlaying {
+  pointer-events: none;
+}
+
+.isPlaying {
+  background-color: #f441a5;
+}
+
 .periodicTable {
   display: grid;
   grid-template-columns: repeat(18, 1fr);
@@ -14,7 +27,7 @@ p {
   margin-left: 2%;
   font-weight: bold;
 }
-button {
+.btn {
   margin: 0 auto;
   display: block;
   border: none;
@@ -28,7 +41,7 @@ button {
   transition: 0.5s linear;
   box-shadow: 0 0 0 3px white, 0 0 0 6px #03a9f4;
 }
-button:hover {
+.btn:hover {
   color: red;
   animation: animate 8s linear infinite;
   font-size: 20px;

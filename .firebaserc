@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "tigik-8d88c"
+  },
+  "targets": {
+    "tigik-8d88c": {
+      "hosting": {
+        "tigik": [
+          "tigik-8d88c"
+        ]
+      }
+    }
   }
 }

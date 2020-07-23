@@ -9,14 +9,14 @@ describe("FindComponent", () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [FindComponent]
+      declarations: [FindComponent],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(FindComponent);
     component = fixture.componentInstance;
-    component.level$ = of("a");
+    // component.level$ = of("a");
     fixture.detectChanges();
   });
 
