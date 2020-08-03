@@ -6,8 +6,6 @@ import { AuthService } from "app/auth/auth.service";
   templateUrl: "./user-profile.component.html",
   styleUrls: ["./user-profile.component.css"],
 })
-export class UserProfileComponent implements OnInit {
+export class UserProfileComponent {
   constructor(public auth: AuthService) {}
-
-  ngOnInit() {}
 }

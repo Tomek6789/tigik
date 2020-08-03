@@ -1,82 +1,49 @@
-<p>LOGIN</p>
-<app-user-profile></app-user-profile>
-<hr />
-
-<div class="visitor">
-  <p>Play as guest</p>
+<!-- <app-user-profile></app-user-profile> -->
+<div *ngIf="!(myRoom$ | async)?.startGame" class="players">
+  <button (click)="showRooms()" mat-raised-button color="primary">
+    Show rooms
+  </button>
   <button
-    class="btn"
-    *ngIf="!(userData$ | async)?.isVisitor"
-    (click)="playAsVisitor()"
-  >
-    Play as guest
-  </button>
-  <p>TUTAJ {{ (userData$ | async)?.isVisitor }}</p>
-</div>
-
-<p>Dostepne pokoje</p>
-<div *ngFor="let room of rooms$ | async" class="players">
-  <button class="btn" (click)="removeRoom(room.key)">Delete room</button>
-  <mat-card
-    *ngIf="room.hostUser"
-    class="hostUser"
-    [class.isPlaying]="showActive | async"
-  >
-    <mat-card-title>{{ room.hostUser.displayName }}</mat-card-title>
-    <mat-card-subtitle
-      >Best score: {{ room.hostUser.bestScore }}</mat-card-subtitle
-    >
-  </mat-card>
-  <mat-card
-    *ngIf="room.guestUser"
-    class="hostUser"
-    [class.isPlaying]="!showActive | async"
-  >
-    <mat-card-title>{{ room.guestUser.displayName }}</mat-card-title>
-    <mat-card-subtitle
-      >Best score:{{ room.guestUser.bestScore }}</mat-card-subtitle
-    >
-  </mat-card>
-
-  <button mat-raised-button color="primary" (click)="joinRoom(room.key)">
-    Join ROOM
-  </button>
-  <button mat-raised-button color="primary" (click)="invitePlayer(room.key)">
-    Invite player
-  </button>
-</div>
-
-<hr />
-
-<div class="text" style="display: flex;">
-  <button
-    *ngIf="!(myRoom$ | async)?.startGame"
-    type="button"
+    *ngIf="(userData$ | async)?.room"
+    mat-raised-button
+    color="accent"
     (click)="startGame()"
-    class="btn"
   >
     Start Game
   </button>
-  <button (click)="storeToDB()" class="btn">Store to DB</button>
-  <button (click)="createRoom()" class="btn">Create Room</button>
 </div>
 
-<hr />
-
-<p>TUTAJ {{ (userData$ | async)?.bestScore }}</p>
-<p>Wybrany pierwiastek {{ (userData$ | async)?.elementSelected }}</p>
-
-<p>START GAME {{ (myRoom$ | async)?.startGame }}</p>
-
 <div *ngIf="(myRoom$ | async)?.startGame">
-  <app-score [points]="state.score"></app-score>
+  <div class="players">
+    <mat-card class="example-card">
+      <mat-card-header>
+        <mat-card-title>{{
+          (hostPlayer$ | async)?.displayName
+        }}</mat-card-title>
+        <mat-card-subtitle
+          >Your score: {{ (hostPlayer$ | async)?.score }}</mat-card-subtitle
+        >
+      </mat-card-header>
+    </mat-card>
+
+    <mat-card class="example-card">
+      <mat-card-header>
+        <mat-card-title>{{
+          (guestPlayer$ | async)?.displayName
+        }}</mat-card-title>
+        <mat-card-subtitle
+          >Your score: {{ (guestPlayer$ | async)?.score }}</mat-card-subtitle
+        >
+      </mat-card-header>
+    </mat-card>
+  </div>
+
   <app-progress-bar
     (finish)="handleFinish($event)"
     [reset$]="level$"
   ></app-progress-bar>
 </div>
-<p>YOUR THE BEST SCORE IS: {{ state.bestScore }}</p>
-<!-- [class.isNotPlaying]="isPlaying | async" -->
+
 <div class="periodicTable">
   <ng-container *ngIf="(myRoom$ | async)?.startGame">
     <app-find

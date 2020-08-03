@@ -3,7 +3,7 @@ import { AngularFireDatabase } from "@angular/fire/database";
 import { AuthService } from "app/auth/auth.service";
 import { User } from "app/auth/user.model";
 import { BehaviorSubject, merge } from "rxjs";
-import { filter, switchMap, tap } from "rxjs/operators";
+import { filter, switchMap, tap, map } from "rxjs/operators";
 
 @Injectable({ providedIn: "root" })
 export class UserService {
@@ -43,7 +43,8 @@ export class UserService {
   logoutUser$ = this.user$.pipe(
     filter((user) => !user),
     tap(() => {
-      if (this.user) {
+      console.log("logout, user", this.user);
+      if (this.user && this.user.role) {
         const key = this.user.role === "host" ? "hostUser" : "guestUser";
         // remove user from room
         this.database.list("rooms").update(this.user.room, { [key]: null });
@@ -56,7 +57,7 @@ export class UserService {
 
   userApp$ = merge(this.signIn$, this.loginUser$, this.logoutUser$);
 
-  updateScore(score: number) {
+  updateBestScore(score: number) {
     if (!this.user) {
       console.log(
         "Jestes wylogowany, zaloguj sie jesli chcesz zapisywac wynik"
@@ -64,6 +65,16 @@ export class UserService {
       return;
     }
     this.users.update(this.user.uid, { bestScore: score });
+  }
+
+  updateScore(score: number) {
+    if (!this.user) {
+      console.log(
+        "Jestes wylogowany, zaloguj sie jesli chcesz zapisywac wynik"
+      );
+      return;
+    }
+    this.users.update(this.user.uid, { score });
   }
 
   updateElement(symbol: string) {
@@ -75,21 +86,26 @@ export class UserService {
   }
 
   updateRoomAndRole(room: string, role: "host" | "guest") {
-    this.users.update(this.user.uid, { room, role });
+    if (this.user) {
+      this.users.update(this.user.uid, { room, role });
+    }
   }
 
   getUser(uid: string) {
     return this.database
       .list<User>("users", (ref) => ref.orderByKey().equalTo(uid))
-      .valueChanges();
+      .valueChanges()
+      .pipe(map(([user]) => user));
   }
 
-  createVisitor() {
+  createVisitor(displayName: string) {
     const a = {
+      displayName,
       isVisitor: true,
-      displayName: "Visitor",
+      score: 0,
     };
     const visitor = this.users.push(a);
+    console.log("AA 2", visitor.key);
 
     this.database
       .list<User>("/users", (ref) => ref.orderByKey().equalTo(visitor.key))
@@ -109,11 +125,10 @@ export class UserService {
   }
 
   deleteVisitor() {
+    console.log("DELETE USER - VISITOR");
+    console.log(this.user);
     if (this.user && this.user.isVisitor) {
       this.users.remove(this.user.uid);
-      const key = this.user.role === "host" ? "hostUser" : "guestUser";
-      // remove user from room
-      this.database.list("rooms").update(this.user.room, { [key]: null });
     }
   }
 }

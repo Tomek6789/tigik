@@ -11,10 +11,13 @@ import {
   share,
   shareReplay,
 } from "rxjs/operators";
+import { Observable } from "rxjs";
 
-interface Room {
-  guestUser: Partial<User>;
-  hostUser: Partial<User>;
+export interface Room {
+  guestUserUid: string;
+  hostUserUid: string;
+  hostUserName: string;
+  guestUserName: string;
   name: string;
   startGame: boolean;
   searchingElement: string;
@@ -44,8 +47,8 @@ export class RoomsService {
     switchMap(({ uid, role }) => {
       return this.database
         .list<Room>("rooms", (ref) => {
-          const key = role === "host" ? "hostUser" : "guestUser";
-          return ref.orderByChild(`${key}/uid`).equalTo(uid);
+          const key = role === "host" ? "hostUserUid" : "guestUserUid";
+          return ref.orderByChild(`${key}`).equalTo(uid);
         })
         .valueChanges();
     }),
@@ -57,17 +60,17 @@ export class RoomsService {
     shareReplay(1)
   );
 
-  joinRoom(key: string) {
-    this.userService.userData$.pipe(take(1)).subscribe((user) => {
-      this.rooms.update(key, { guestUser: user });
-    });
+  joinRoom(key: string, uid: string) {
+    this.rooms.update(key, { guestUserUid: uid });
   }
 
-  createRoom(user: User) {
+  createRoom(uid: string, hostName: string) {
     return this.rooms.push({
       name: "test",
-      hostUser: user,
-      guestUser: null,
+      hostUserUid: uid,
+      hostUserName: hostName,
+      guestUserUid: null,
+      guestUserName: null,
       startGame: false,
       searchingElement: null,
       player: "host",
@@ -76,6 +79,10 @@ export class RoomsService {
 
   removeRoom(roomKey: string) {
     this.rooms.remove(roomKey);
+  }
+
+  removeGuestFromRoom(roomKey: string) {
+    this.rooms.update(roomKey, { guestUserUid: null });
   }
 
   startGame(roomKey: string, status: boolean, element: string) {
