@@ -1,7 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit } from "@angular/core";
-import { Observable } from "rxjs/Rx";
-import { timer, of } from "rxjs";
-import { take, tap, repeatWhen } from "rxjs/operators";
+import { Observable, timer, of } from "rxjs";
+import { take, tap, repeatWhen, switchMap } from "rxjs/operators";
 
 @Component({
   selector: "app-progress-bar",
@@ -26,6 +25,6 @@ export class ProgressBarComponent implements OnInit {
       })
     );
 
-    this.value$ = this.reset$.switchMap(() => timer$);
+    this.value$ = this.reset$.pipe(switchMap(() => timer$));
   }
 }
