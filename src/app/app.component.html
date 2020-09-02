@@ -1,20 +1,56 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div class="text">
-  <button *ngIf="!state.start" type="button" (click)="startGame()">
+<!-- <app-user-profile></app-user-profile> -->
+<div *ngIf="!(myRoom$ | async)?.startGame" class="players">
+  <button (click)="showRooms()" mat-raised-button color="primary">
+    Show rooms
+  </button>
+  <button
+    *ngIf="(userData$ | async)?.room"
+    mat-raised-button
+    color="accent"
+    (click)="startGame()"
+  >
     Start Game
   </button>
 </div>
-<div *ngIf="state.start">
-  <app-score [(counter)]="state.score"></app-score>
+
+<div *ngIf="(myRoom$ | async)?.startGame">
+  <div class="players">
+    <mat-card class="example-card">
+      <mat-card-header>
+        <mat-card-title>{{
+          (hostPlayer$ | async)?.displayName
+        }}</mat-card-title>
+        <mat-card-subtitle
+          >Your score: {{ (hostPlayer$ | async)?.score }}</mat-card-subtitle
+        >
+      </mat-card-header>
+    </mat-card>
+
+    <mat-card class="example-card">
+      <mat-card-header>
+        <mat-card-title>{{
+          (guestPlayer$ | async)?.displayName
+        }}</mat-card-title>
+        <mat-card-subtitle
+          >Your score: {{ (guestPlayer$ | async)?.score }}</mat-card-subtitle
+        >
+      </mat-card-header>
+    </mat-card>
+  </div>
+
   <app-progress-bar
     (finish)="handleFinish($event)"
     [reset$]="level$"
   ></app-progress-bar>
 </div>
-<p>YOUR THE BEST SCORE IS: {{ state.bestScore }}</p>
 
 <div class="periodicTable">
-  <app-find *ngIf="state.start" class="find" [level$]="level$"></app-find>
+  <ng-container *ngIf="(myRoom$ | async)?.startGame">
+    <app-find
+      class="find"
+      [searchingElement]="(myRoom$ | async)?.searchingElement"
+    ></app-find>
+  </ng-container>
   <app-element
     *ngFor="let element of table"
     class="{{ 'element-' + element.symbol }}"
@@ -24,5 +60,3 @@
   </app-element>
   <span></span>
 </div>
-
-<!-- <button (click)="storeToDB()">Store to DB</button> -->
