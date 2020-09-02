@@ -1,6 +1,6 @@
 import { Clipboard } from "@angular/cdk/clipboard";
 import { Component, HostListener, OnDestroy, OnInit } from "@angular/core";
-import { Observable, Subject, of } from "rxjs";
+import { Observable, BehaviorSubject, of } from "rxjs";
 import {
   filter,
   switchMap,
@@ -8,7 +8,6 @@ import {
   takeUntil,
   withLatestFrom,
 } from "rxjs/operators";
-import { BehaviorSubject } from "rxjs/Rx";
 import { User } from "./auth/user.model";
 import { DialogService } from "./dialogs/dialog.service";
 import { ActionsTypes } from "./dialogs/rooms-dialog/rooms-dialog.component";

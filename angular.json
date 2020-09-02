@@ -53,7 +53,6 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "disableHostCheck": true,
             "browserTarget": "tigik:build"
           },
           "configurations": {
