@@ -53,4 +53,6 @@ export class RoomsDialogComponent {
       type: ActionsTypes.START,
     });
   }
+
+  invitePlayer(key: string) {}
 }
