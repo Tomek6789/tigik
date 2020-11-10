@@ -1,0 +1,13 @@
+<div *ngIf="!isStartGame" class="players">
+  <button (click)="onShowRooms()" mat-raised-button color="primary">
+    Show rooms
+  </button>
+  <button
+    *ngIf="hasRoom"
+    mat-raised-button
+    color="accent"
+    (click)="onStartGame()"
+  >
+    Start Game
+  </button>
+</div>

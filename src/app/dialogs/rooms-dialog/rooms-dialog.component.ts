@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Inject } from "@angular/core";
 import { MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { Room } from "app/rooms/rooms.service";
+import { Room } from "app/services/rooms.service";
 
 export interface DialogData {
   rooms: Room[];

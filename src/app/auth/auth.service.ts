@@ -9,7 +9,7 @@ import {
 } from "@angular/fire/firestore";
 import { auth } from "firebase/app";
 import { switchMap, tap } from "rxjs/operators";
-import { RoomsService } from "app/rooms/rooms.service";
+import { RoomsService } from "app/services/rooms.service";
 
 @Injectable({
   providedIn: "root",
