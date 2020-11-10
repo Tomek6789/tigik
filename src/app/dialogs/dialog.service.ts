@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { WelcomeDialogComponent } from "./welcome-dialog/welcome-dialog.component";
 import { RoomsDialogComponent } from "./rooms-dialog/rooms-dialog.component";
-import { Room } from "app/rooms/rooms.service";
+import { Room } from "app/services/rooms.service";
 import { Observable } from "rxjs";
 
 @Injectable({

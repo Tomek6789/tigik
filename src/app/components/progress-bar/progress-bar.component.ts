@@ -1,6 +1,6 @@
-import { Component, Input, Output, EventEmitter, OnInit } from "@angular/core";
-import { Observable, timer, of } from "rxjs";
-import { take, tap, repeatWhen, switchMap } from "rxjs/operators";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Observable, timer } from "rxjs";
+import { switchMap, take, tap } from "rxjs/operators";
 
 @Component({
   selector: "app-progress-bar",
@@ -16,7 +16,7 @@ export class ProgressBarComponent implements OnInit {
   @Output() finish: EventEmitter<boolean> = new EventEmitter();
 
   ngOnInit() {
-    let timer$ = timer(0, 100).pipe(
+    let timer$ = timer(0, 1000).pipe(
       take(101),
       tap((x) => {
         if (x === 100) {

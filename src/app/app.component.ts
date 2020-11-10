@@ -1,8 +1,11 @@
 import { Clipboard } from "@angular/cdk/clipboard";
 import { Component, HostListener, OnDestroy, OnInit } from "@angular/core";
-import { Observable, BehaviorSubject, of } from "rxjs";
+import { BehaviorSubject, Observable, of } from "rxjs";
 import {
   filter,
+  map,
+  pluck,
+  shareReplay,
   switchMap,
   take,
   takeUntil,
@@ -11,12 +14,12 @@ import {
 import { User } from "./auth/user.model";
 import { DialogService } from "./dialogs/dialog.service";
 import { ActionsTypes } from "./dialogs/rooms-dialog/rooms-dialog.component";
-import { LotteryService } from "./lottery.service";
 import { Element } from "./models/element";
-import { PeriodicTableService } from "./periodic-table.service";
-import { Room, RoomsService } from "./rooms/rooms.service";
-import { SnackBarService } from "./snackbar/snackbar.service";
-import { UserService } from "./users/users.service";
+import { LotteryService } from "./services/lottery.service";
+import { PeriodicTableService } from "./services/periodic-table.service";
+import { Room, RoomsService } from "./services/rooms.service";
+import { SnackBarService } from "./services/snackbar.service";
+import { UserService } from "./services/users.service";
 
 @Component({
   selector: "app-root",
@@ -24,7 +27,7 @@ import { UserService } from "./users/users.service";
   styleUrls: ["./app.component.css"],
 })
 export class AppComponent implements OnInit, OnDestroy {
-  table: Element[];
+  table$: Observable<Element[]> = this.periodicTableService.getPeriodicTable();
   symbol: string;
 
   state = {
@@ -37,8 +40,14 @@ export class AppComponent implements OnInit, OnDestroy {
   searchingElement: string;
 
   userData$ = this.userService.userData$;
+  hasRoom$ = this.userData$.pipe(pluck("room"));
   rooms$ = this.roomsService.rooms$;
   myRoom$ = this.roomsService.myRoom$;
+
+  startGame$ = this.myRoom$.pipe(pluck("startGame"), shareReplay(1));
+  periodicTableRoom$ = this.myRoom$.pipe(
+    map(({ startGame, searchingElement }) => ({ startGame, searchingElement }))
+  );
 
   roomsDialog: any;
 
@@ -100,12 +109,6 @@ export class AppComponent implements OnInit, OnDestroy {
   );
 
   ngOnInit() {
-    this.periodicTableService
-      .getPeriodicTable()
-      .subscribe((data: Element[]) => {
-        this.table = data;
-      });
-
     // TO DO: Unsubscribe
     this.userService.userApp$.subscribe();
 
@@ -144,6 +147,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   handleFinish(finish) {
+    console.log(finish);
     this.userData$.pipe(take(1)).subscribe(({ room }) => {
       this.roomsService.startGame(room, false, this.searchingElement);
       this.userService.updateBestScore(this.state.score);

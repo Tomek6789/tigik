@@ -24,11 +24,12 @@ import { AuthGuard } from "./auth/auth.guard";
 import { AuthModule } from "./auth/auth.module";
 import { RoomsDialogComponent } from "./dialogs/rooms-dialog/rooms-dialog.component";
 import { WelcomeDialogComponent } from "./dialogs/welcome-dialog/welcome-dialog.component";
-import { ElementComponent } from "./element/element.component";
-import { FindComponent } from "./find/find.component";
-import { PeriodicTableService } from "./periodic-table.service";
-import { ProgressBarComponent } from "./progress-bar/progress-bar.component";
-import { UserService } from "./users/users.service";
+import { PeriodicTableService } from "./services/periodic-table.service";
+import { ProgressBarComponent } from "./components/progress-bar/progress-bar.component";
+import { UserService } from "./services/users.service";
+import { PeriodicTableComponent } from "./components/periodic-table/periodic-table.component";
+import { MenuComponent } from "./components/menu/menu.component";
+import { PlayerCardComponent } from './components/player-card/player-card.component';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAvbcQYPx6Ak_gBHZjXBg7VP3mXp2-m1KU",
@@ -72,15 +73,15 @@ const firebaseConfig = {
   ],
   declarations: [
     AppComponent,
-    ElementComponent,
     ProgressBarComponent,
 
-    FindComponent,
     WelcomeDialogComponent,
     RoomsDialogComponent,
+    PeriodicTableComponent,
+    MenuComponent,
+    PlayerCardComponent,
   ],
   providers: [PeriodicTableService, UserService, AuthGuard],
   bootstrap: [AppComponent],
-  entryComponents: [FindComponent],
 })
 export class AppModule {}

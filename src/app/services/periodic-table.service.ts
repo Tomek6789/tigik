@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { catchError } from "rxjs/operators";
+import { Element } from "app/models/element";
 
 @Injectable()
 export class PeriodicTableService {
@@ -9,7 +10,7 @@ export class PeriodicTableService {
 
   public getPeriodicTable() {
     return this.http
-      .get("../assets/periodicTable.json")
+      .get<Element[]>("../assets/periodicTable.json")
       .pipe(catchError((error: any) => Observable.throw(error)));
   }
 }

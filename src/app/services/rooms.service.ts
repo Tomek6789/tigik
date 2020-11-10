@@ -1,17 +1,7 @@
 import { Injectable } from "@angular/core";
 import { AngularFireDatabase } from "@angular/fire/database";
-import { User } from "app/auth/user.model";
-import { UserService } from "app/users/users.service";
-import {
-  map,
-  take,
-  tap,
-  filter,
-  switchMap,
-  share,
-  shareReplay,
-} from "rxjs/operators";
-import { Observable } from "rxjs";
+import { UserService } from "app/services/users.service";
+import { filter, map, shareReplay, switchMap } from "rxjs/operators";
 
 export interface Room {
   guestUserUid: string;
@@ -23,6 +13,8 @@ export interface Room {
   searchingElement: string;
   player: "host" | "guest";
 }
+
+export type PeriodicTableRoom = Pick<Room, "startGame" | "searchingElement">;
 
 @Injectable({
   providedIn: "root",
@@ -56,7 +48,7 @@ export class RoomsService {
       this.myRoom = myRoom;
       return myRoom;
     }),
-    filter(Boolean),
+    filter<Room>(Boolean),
     shareReplay(1)
   );
 

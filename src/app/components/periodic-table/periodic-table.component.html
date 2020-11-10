@@ -1,0 +1,13 @@
+<div class="periodicTable">
+  <ng-container *ngIf="periodicTableRoom?.startGame">
+    <div class="find">{{ periodicTableRoom?.searchingElement }}</div>
+  </ng-container>
+
+  <div
+    *ngFor="let element of table"
+    class="border box {{ 'element-' + element.symbol }}"
+    (click)="handleSelected(element.symbol)"
+  >
+    {{ element.symbol }}
+  </div>
+</div>

@@ -13,7 +13,8 @@ export class UserService {
   users = this.database.list("users");
 
   user: User;
-  userData$ = new BehaviorSubject<User>(null);
+  private userDataSubject = new BehaviorSubject<User>(null);
+  public userData$ = this.userDataSubject.asObservable();
 
   signIn$ = this.user$.pipe(
     filter(Boolean),
@@ -36,7 +37,7 @@ export class UserService {
         ...user.payload.val(),
       };
       console.log("next", this.user);
-      this.userData$.next(this.user);
+      this.userDataSubject.next(this.user);
     })
   );
 
@@ -117,7 +118,7 @@ export class UserService {
             ...user.payload.val(),
           };
           console.log("next - visitor", this.user);
-          this.userData$.next(this.user);
+          this.userDataSubject.next(this.user);
         })
       )
       // TO DO: UNSUBSCRIBE!

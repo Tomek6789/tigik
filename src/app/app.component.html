@@ -1,62 +1,21 @@
 <!-- <app-user-profile></app-user-profile> -->
-<div *ngIf="!(myRoom$ | async)?.startGame" class="players">
-  <button (click)="showRooms()" mat-raised-button color="primary">
-    Show rooms
-  </button>
-  <button
-    *ngIf="(userData$ | async)?.room"
-    mat-raised-button
-    color="accent"
-    (click)="startGame()"
-  >
-    Start Game
-  </button>
-</div>
-
-<div *ngIf="(myRoom$ | async)?.startGame">
-  <div class="players">
-    <mat-card class="example-card">
-      <mat-card-header>
-        <mat-card-title>{{
-          (hostPlayer$ | async)?.displayName
-        }}</mat-card-title>
-        <mat-card-subtitle
-          >Your score: {{ (hostPlayer$ | async)?.score }}</mat-card-subtitle
-        >
-      </mat-card-header>
-    </mat-card>
-
-    <mat-card class="example-card">
-      <mat-card-header>
-        <mat-card-title>{{
-          (guestPlayer$ | async)?.displayName
-        }}</mat-card-title>
-        <mat-card-subtitle
-          >Your score: {{ (guestPlayer$ | async)?.score }}</mat-card-subtitle
-        >
-      </mat-card-header>
-    </mat-card>
-  </div>
-
-  <app-progress-bar
-    (finish)="handleFinish($event)"
-    [reset$]="level$"
-  ></app-progress-bar>
-</div>
-
-<div class="periodicTable">
-  <ng-container *ngIf="(myRoom$ | async)?.startGame">
-    <app-find
-      class="find"
-      [searchingElement]="(myRoom$ | async)?.searchingElement"
-    ></app-find>
-  </ng-container>
-  <app-element
-    *ngFor="let element of table"
-    class="{{ 'element-' + element.symbol }}"
-    [element]="element"
-    (selected)="handleSelected($event)"
-  >
-  </app-element>
-  <span></span>
-</div>
+<app-menu
+  [isStartGame]="startGame$ | async"
+  [hasRoom]="hasRoom$ | async"
+  (startGame)="startGame()"
+  (showRooms)="showRooms()"
+></app-menu>
+<section *ngIf="startGame$ | async" class="players">
+  <app-player-card [player]="hostPlayer$ | async"></app-player-card>
+  <app-player-card [player]="guestPlayer$ | async"></app-player-card>
+</section>
+<app-progress-bar
+  *ngIf="startGame$ | async"
+  (finish)="handleFinish($event)"
+  [reset$]="level$"
+></app-progress-bar>
+<app-periodic-table
+  [table]="table$ | async"
+  [periodicTableRoom]="periodicTableRoom$ | async"
+  (selected)="handleSelected($event)"
+></app-periodic-table>
