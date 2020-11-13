@@ -78,14 +78,6 @@ export class UserService {
     this.users.update(this.user.uid, { score });
   }
 
-  updateElement(symbol: string) {
-    if (!this.user) {
-      console.log("Jestes wylogowany");
-      return;
-    }
-    this.users.update(this.user.uid, { elementSelected: symbol });
-  }
-
   updateRoomAndRole(room: string, role: "host" | "guest") {
     if (this.user) {
       this.users.update(this.user.uid, { room, role });
@@ -126,8 +118,6 @@ export class UserService {
   }
 
   deleteVisitor() {
-    console.log("DELETE USER - VISITOR");
-    console.log(this.user);
     if (this.user && this.user.isVisitor) {
       this.users.remove(this.user.uid);
     }
