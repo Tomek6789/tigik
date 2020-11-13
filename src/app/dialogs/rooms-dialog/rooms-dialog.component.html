@@ -2,56 +2,48 @@
   <button mat-raised-button color="primary" (click)="onCreateRoom()">
     Create Room
   </button>
-
   <button
     mat-raised-button
     color="primary"
-    [disabled]="!shoes.selectedOptions.selected[0]?.value"
-    (click)="onJoinRoom(shoes.selectedOptions.selected[0]?.value)"
-  >
-    Join Room
-  </button>
-  <button
-    mat-raised-button
-    color="primary"
-    [disabled]="!shoes.selectedOptions.selected[0]?.value"
-    (click)="invitePlayer(shoes.selectedOptions.selected[0]?.value)"
+    (click)="onInvitePlayer(shoes.selectedOptions.selected[0]?.value)"
   >
     Invite player
   </button>
-  <button
-    mat-raised-button
-    [disabled]="!shoes.selectedOptions.selected[0]?.value"
-    (click)="onDeleteRoom(shoes.selectedOptions.selected[0]?.value)"
-  >
-    Delete room
-  </button>
   <button mat-raised-button mat-dialog-close>Close</button>
-  <button
+  <!-- <button
     mat-raised-button
     color="accent"
     [disabled]="!shoes.selectedOptions.selected[0]?.value"
     (click)="onStartGame()"
   >
     Start Game
-  </button>
+  </button> -->
 </div>
 
 <p>Dostepne pokoje</p>
 
 <mat-selection-list #shoes [multiple]="false">
-  <mat-list-option *ngFor="let room of data.rooms | async" [value]="room.key">
+  <mat-list-option *ngFor="let room of rooms$ | async" [value]="room.key">
     <div class="box">
       <div>
-        <mat-icon color="primary">home</mat-icon>
-        <div matLine>Player 1:</div>
-        <div matLine>{{ room.hostUserName }}</div>
+        <mat-icon color="primary">face</mat-icon>
       </div>
       <div>
-        <mat-icon color="warn">home</mat-icon>
+        <mat-icon color="warn">face</mat-icon>
         <div matLine>Player 2:</div>
-        <!-- <div matLine>{{ room.guestUser?.displayName }}</div> -->
-        <!-- <div matLine>{{ room.bestScore }}</div> -->
+      </div>
+      <div>
+        <button
+          *ngIf="!(hasRoom$ | async)"
+          mat-button
+          color="primary"
+          (click)="onJoinRoom(room.key)"
+        >
+          <mat-icon>add</mat-icon>
+        </button>
+        <button mat-button color="primary" (click)="onDeleteRoom(room.key)">
+          <mat-icon>delete</mat-icon>
+        </button>
       </div>
     </div>
   </mat-list-option>
