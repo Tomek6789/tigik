@@ -50,11 +50,11 @@ const firebaseConfig = {
     BrowserModule,
     BrowserAnimationsModule,
     RouterModule.forRoot([
-      {
+    {
         path: "",
         component: AppComponent,
-      },
-    ]),
+    },
+], { relativeLinkResolution: 'legacy' }),
     HttpClientModule,
 
     ReactiveFormsModule,
