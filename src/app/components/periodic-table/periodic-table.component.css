@@ -46,7 +46,11 @@
   }
 }
 
-.element-H,
+.element-H {
+  color: rgb(153, 0, 0);
+  background-color: rgb(236, 185, 43);
+}
+
 .element-C {
   color: rgb(153, 0, 0);
   background-color: #22ff22;
