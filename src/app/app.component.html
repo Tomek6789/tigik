@@ -1,21 +1,8 @@
 <!-- <app-user-profile></app-user-profile> -->
-<app-menu
-  [isStartGame]="startGame$ | async"
-  [hasRoom]="hasRoom$ | async"
-  (startGame)="startGame()"
-  (showRooms)="showRooms()"
-></app-menu>
+<app-menu [isStartGame]="startGame$ | async" [hasRoom]="hasRoom$ | async" (startGame)="startGame()" (showRooms)="showRooms()"></app-menu>
 <section *ngIf="startGame$ | async" class="players">
-  <app-player-card [player]="hostPlayer$ | async"></app-player-card>
-  <app-player-card [player]="guestPlayer$ | async"></app-player-card>
+    <app-player-card [player]="hostPlayer$ | async"></app-player-card>
+    <app-player-card [player]="guestPlayer$ | async"></app-player-card>
 </section>
-<app-progress-bar
-  *ngIf="startGame$ | async"
-  (finish)="handleFinish($event)"
-  [reset$]="level$"
-></app-progress-bar>
-<app-periodic-table
-  [table]="table$ | async"
-  [periodicTableRoom]="periodicTableRoom$ | async"
-  (selected)="handleSelected($event)"
-></app-periodic-table>
+<app-progress-bar *ngIf="startGame$ | async" (finish)="handleFinish($event)" [reset$]="level$"></app-progress-bar>
+<app-periodic-table [table]="table$ | async" [periodicTableRoom]="periodicTableRoom$ | async" (selected)="handleSelected($event)"></app-periodic-table>
