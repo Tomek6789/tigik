@@ -31,30 +31,24 @@ import { PeriodicTableComponent } from "./components/periodic-table/periodic-tab
 import { MenuComponent } from "./components/menu/menu.component";
 import { PlayerCardComponent } from './components/player-card/player-card.component';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAvbcQYPx6Ak_gBHZjXBg7VP3mXp2-m1KU",
-  authDomain: "tigik-8d88c.firebaseapp.com",
-  databaseURL: "https://tigik-8d88c.firebaseio.com",
-  projectId: "tigik-8d88c",
-  storageBucket: "tigik-8d88c.appspot.com",
-  messagingSenderId: "977073675514",
-  appId: "1:977073675514:web:49cbd33aee3e6056e07d43",
-};
+import { environment } from '../environments/environment';
+
+console.log(environment)
 
 @NgModule({
   imports: [
-    AngularFireModule.initializeApp(firebaseConfig),
+    AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFirestoreModule,
     AngularFireAuthModule,
     AngularFireDatabaseModule,
     BrowserModule,
     BrowserAnimationsModule,
     RouterModule.forRoot([
-    {
+      {
         path: "",
         component: AppComponent,
-    },
-], { relativeLinkResolution: 'legacy' }),
+      },
+    ], { relativeLinkResolution: 'legacy' }),
     HttpClientModule,
 
     ReactiveFormsModule,
@@ -84,4 +78,4 @@ const firebaseConfig = {
   providers: [PeriodicTableService, UserService, AuthGuard],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }
