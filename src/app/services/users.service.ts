@@ -7,7 +7,7 @@ import { filter, switchMap, tap, map } from "rxjs/operators";
 
 @Injectable({ providedIn: "root" })
 export class UserService {
-  constructor(public auth: AuthService, public database: AngularFireDatabase) {}
+  constructor(public auth: AuthService, public database: AngularFireDatabase) { }
 
   user$ = this.auth.user$;
   users = this.database.list("users");
@@ -16,35 +16,24 @@ export class UserService {
   private userDataSubject = new BehaviorSubject<User>(null);
   public userData$ = this.userDataSubject.asObservable();
 
+
   signIn$ = this.user$.pipe(
-    filter(Boolean),
-    switchMap(({ uid, displayName }) => {
-      return this.database.list("/users").update(uid, { uid, displayName });
-    })
-  );
-
-  loginUser$ = this.user$.pipe(
     filter<User>(Boolean),
-    switchMap((user) =>
-      this.database
-        .list<User>("/users", (ref) => ref.orderByKey().equalTo(user.uid))
-        .snapshotChanges()
-    ),
-
-    tap(([user]) => {
+    switchMap((user) => {
+      console.log(user, 'SIGNIN')
       this.user = {
-        uid: user.key,
-        ...user.payload.val(),
-      };
-      console.log("next", this.user);
-      this.userDataSubject.next(this.user);
+        uid: user.uid,
+        displayName: user.displayName || 'Annonymous'
+      }
+      this.userDataSubject.next(this.user)
+      return this.database.list("users").update(user.uid, this.user);
     })
   );
 
   logoutUser$ = this.user$.pipe(
     filter((user) => !user),
-    tap(() => {
-      console.log("logout, user", this.user);
+    tap((userA) => {
+      console.log('LOGOUT', userA)
       if (this.user && this.user.role) {
         const key = this.user.role === "host" ? "hostUser" : "guestUser";
         // remove user from room
@@ -53,10 +42,11 @@ export class UserService {
       }
 
       this.user = null;
+      this.userDataSubject.next(null)
     })
   );
 
-  userApp$ = merge(this.signIn$, this.loginUser$, this.logoutUser$);
+  userApp$ = merge(this.signIn$, this.logoutUser$);
 
   updateBestScore(score: number) {
     if (!this.user) {
@@ -85,41 +75,10 @@ export class UserService {
   }
 
   getUser(uid: string) {
+    console.log(uid)
     return this.database
       .list<User>("users", (ref) => ref.orderByKey().equalTo(uid))
       .valueChanges()
-      .pipe(map(([user]) => user));
-  }
-
-  createVisitor(displayName: string) {
-    const a = {
-      displayName,
-      isVisitor: true,
-      score: 0,
-    };
-    const visitor = this.users.push(a);
-    console.log("AA 2", visitor.key);
-
-    this.database
-      .list<User>("/users", (ref) => ref.orderByKey().equalTo(visitor.key))
-      .snapshotChanges()
-      .pipe(
-        tap(([user]) => {
-          this.user = {
-            uid: user.key,
-            ...user.payload.val(),
-          };
-          console.log("next - visitor", this.user);
-          this.userDataSubject.next(this.user);
-        })
-      )
-      // TO DO: UNSUBSCRIBE!
-      .subscribe();
-  }
-
-  deleteVisitor() {
-    if (this.user && this.user.isVisitor) {
-      this.users.remove(this.user.uid);
-    }
+      .pipe(map(([user]) => user), tap(console.log));
   }
 }

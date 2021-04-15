@@ -13,5 +13,5 @@ export class WelcomeDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<WelcomeDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
+  ) { }
 }

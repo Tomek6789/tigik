@@ -4,9 +4,10 @@ import { User } from "app/auth/user.model";
 import { Room, RoomsService } from "app/services/rooms.service";
 import { SnackBarService } from "app/services/snackbar.service";
 import { UserService } from "app/services/users.service";
-import { Subject } from "rxjs";
+import { iif, Observable, of, Subject } from "rxjs";
 import { filter, takeUntil, take, pluck, tap } from "rxjs/operators";
 import { Clipboard } from "@angular/cdk/clipboard";
+import { Router, UrlSerializer } from "@angular/router";
 
 export interface DialogData {
   rooms: Room[];
@@ -34,20 +35,25 @@ export class RoomsDialogComponent implements OnDestroy {
 
   rooms$ = this.roomsService.rooms$;
   user$ = this.userService.userData$;
+
   hasRoom$ = this.user$.pipe(
     pluck("room"),
-    tap((a) => console.log("HAS ROOM", a))
   );
 
   private destroy$ = new Subject();
 
+
   constructor(
+    private router: Router,
+    private serializer: UrlSerializer,
     private snackBarService: SnackBarService,
     public dialog: MatDialog,
     private clipboard: Clipboard,
     private roomsService: RoomsService,
     private userService: UserService
-  ) {}
+  ) { }
+
+
 
   ngOnDestroy() {
     this.destroy$.next(true);
@@ -58,7 +64,7 @@ export class RoomsDialogComponent implements OnDestroy {
     this.user$
       .pipe(
         take(1),
-        filter((user) => this.validateUser(user))
+        // filter((user) => this.validateUser(user))
       )
       .subscribe((user) => {
         const room = this.roomsService.createRoom(user.uid);
@@ -78,14 +84,16 @@ export class RoomsDialogComponent implements OnDestroy {
         filter((user) => this.validateUser(user))
       )
       .subscribe((user) => {
-        console.log("JOIN SUB");
         this.roomsService.joinRoom(roomKey, user.uid);
         this.userService.updateRoomAndRole(roomKey, "guest");
       });
   }
 
   onInvitePlayer(roomKey: string) {
-    this.clipboard.copy(`https://chemgame.pl/room=${roomKey}`);
+    console.log(roomKey, 'roomKey')
+    const tree = this.router.createUrlTree([], { queryParams: { room: roomKey } });
+
+    this.clipboard.copy(`http://localhost:4200${this.serializer.serialize(tree)}`);
     this.snackBarService.openSnackBar("Send this link to your friend");
   }
 
@@ -123,5 +131,5 @@ export class RoomsDialogComponent implements OnDestroy {
     });
   }
 
-  invitePlayer(key: string) {}
+  invitePlayer(key: string) { }
 }

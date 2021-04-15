@@ -19,7 +19,7 @@ export class RoomsService {
   constructor(
     private database: AngularFireDatabase,
     private userService: UserService
-  ) {}
+  ) { }
 
   rooms = this.database.list<Room>("rooms");
   rooms$ = this.rooms.snapshotChanges().pipe(
@@ -49,8 +49,8 @@ export class RoomsService {
     shareReplay(1)
   );
 
-  joinRoom(key: string, uid: string) {
-    this.rooms.update(key, { guestUserUid: uid });
+  joinRoom(key: string, guestUid: string) {
+    this.rooms.update(key, { guestUserUid: guestUid });
   }
 
   createRoom(uid: string) {
