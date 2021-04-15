@@ -33,8 +33,6 @@ import { PlayerCardComponent } from './components/player-card/player-card.compon
 
 import { environment } from '../environments/environment';
 
-console.log(environment)
-
 @NgModule({
   imports: [
     AngularFireModule.initializeApp(environment.firebaseConfig),

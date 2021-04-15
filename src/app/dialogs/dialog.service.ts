@@ -1,5 +1,7 @@
 import { Injectable } from "@angular/core";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { AuthService } from "app/auth/auth.service";
+import { RoomsService } from "app/services/rooms.service";
 import { UserService } from "app/services/users.service";
 import { filter, take } from "rxjs/operators";
 import { RoomsDialogComponent } from "./rooms-dialog/rooms-dialog.component";
@@ -11,9 +13,9 @@ import { WelcomeDialogComponent } from "./welcome-dialog/welcome-dialog.componen
 export class DialogService {
   private dialogRef: MatDialogRef<any, any>;
 
-  constructor(public dialog: MatDialog, private userService: UserService) {}
+  constructor(public dialog: MatDialog, private authService: AuthService, private userService: UserService, private roomService: RoomsService) { }
 
-  openWelcomDialog() {
+  openWelcomDialog(inviteRoom: string) {
     this.dialogRef = this.dialog.open(WelcomeDialogComponent, {
       width: "250px",
       disableClose: true,
@@ -23,8 +25,12 @@ export class DialogService {
       .afterClosed()
       .pipe(filter(Boolean), take(1))
       .subscribe((result) => {
-        this.userService.createVisitor(result as string);
-        this.openRoomsDialog();
+        // this.userService.createVisitor(result as string, inviteRoom);
+        if (inviteRoom) {
+          this.roomService.joinRoom
+        } else {
+          this.openRoomsDialog();
+        }
       });
   }
 

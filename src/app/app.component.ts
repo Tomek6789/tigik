@@ -1,6 +1,8 @@
 import { Component, HostListener, OnDestroy, OnInit } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
 import { BehaviorSubject, Observable, of } from "rxjs";
-import { map, pluck, shareReplay, switchMap, take } from "rxjs/operators";
+import { filter, map, pluck, shareReplay, switchMap, take } from "rxjs/operators";
+import { AuthService } from "./auth/auth.service";
 import { User } from "./auth/user.model";
 import { DialogService } from "./dialogs/dialog.service";
 import { Element } from "./models/element";
@@ -37,19 +39,21 @@ export class AppComponent implements OnInit {
   periodicTableRoom$ = this.myRoom$.pipe(
     map(({ startGame, searchingElement }) => ({ startGame, searchingElement }))
   );
+  inviteRoom;
 
-  @HostListener("window:beforeunload", ["$event"])
-  unloadHandler(event) {
-    this.userService.updateRoomAndRole(null, null);
-    this.userService.deleteVisitor();
-    this.userData$.pipe(take(1)).subscribe((user) => {
-      this.roomsService.removeRoom(user.room);
-      const role = user.role === "host" ? "hostUserUid" : "guestUserUid";
-      this.roomsService.removeUserFromRoom(user.room, role);
-    });
-  }
+  // @HostListener("window:beforeunload", ["$event"])
+  // unloadHandler(event) {
+  //   this.userService.updateRoomAndRole(null, null);
+  //   this.userService.deleteVisitor();
+  //   this.userData$.pipe(take(1)).subscribe((user) => {
+  //     this.roomsService.removeRoom(user.room);
+  //     const role = user.role === "host" ? "hostUserUid" : "guestUserUid";
+  //     this.roomsService.removeUserFromRoom(user.room, role);
+  //   });
+  // }
 
   constructor(
+    private activatedRoute: ActivatedRoute,
     private periodicTableService: PeriodicTableService,
     private userService: UserService,
     private roomsService: RoomsService,
@@ -58,9 +62,6 @@ export class AppComponent implements OnInit {
 
     private dialogService: DialogService
   ) {
-    this.hasRoom$.subscribe((room) => {
-      console.log("ROOOM", room);
-    });
 
     this.myRoom$.subscribe(({ searchingElement, startGame }) => {
       // TO DO: Unsubscribe
@@ -96,7 +97,17 @@ export class AppComponent implements OnInit {
     // TO DO: Unsubscribe
     this.userService.userApp$.subscribe();
 
-    this.playAsGuest();
+
+    this.activatedRoute.queryParams.pipe(map(a => a.room), filter<string>(Boolean)).subscribe(roomUid => {
+      console.log(this.inviteRoom, 'INVITEROOM _ SUB')
+      this.userData$.pipe(filter<any>(Boolean)).subscribe(u => {
+        this.userService.updateRoomAndRole(roomUid, 'guest')
+        this.roomsService.joinRoom(roomUid, u.uid)
+      })
+      // this.playAsGuest(this.inviteRoom);
+    });
+
+
   }
 
   handleFinish() {
@@ -135,15 +146,15 @@ export class AppComponent implements OnInit {
       }
       this.roomsService.startGame(user.room, true, this.searchingElement);
     });
-    console.log("START GAME");
   }
 
   private randomElement(): string {
     return this.lotteryService.drawElement(this.state.score);
   }
 
-  playAsGuest() {
-    this.dialogService.openWelcomDialog();
+  playAsGuest(inviteRoom = '') {
+    console.count('DIALOD WELCOM')
+    this.dialogService.openWelcomDialog(inviteRoom);
   }
 
   showRooms() {

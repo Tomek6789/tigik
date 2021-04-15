@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { AuthService } from "app/auth/auth.service";
+import { Subscription } from "rxjs";
 
 @Component({
   selector: "app-user-profile",
@@ -7,5 +8,19 @@ import { AuthService } from "app/auth/auth.service";
   styleUrls: ["./user-profile.component.css"],
 })
 export class UserProfileComponent {
-  constructor(public auth: AuthService) {}
+  show: boolean
+  user: any
+  private sub: Subscription = new Subscription()
+  constructor(public auth: AuthService) { }
+
+  ngOnInit() {
+    this.sub.add(this.auth.user$.subscribe((user) => {
+      this.show = !!user
+      this.user = user
+    }))
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
+  }
 }
