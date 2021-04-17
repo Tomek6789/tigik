@@ -7,7 +7,6 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
 })
 export class MenuComponent {
   @Input() isStartGame: boolean;
-  @Input() hasRoom: boolean;
 
   @Output() showRooms = new EventEmitter();
   @Output() startGame = new EventEmitter();

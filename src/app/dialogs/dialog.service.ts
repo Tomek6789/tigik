@@ -13,25 +13,13 @@ import { WelcomeDialogComponent } from "./welcome-dialog/welcome-dialog.componen
 export class DialogService {
   private dialogRef: MatDialogRef<any, any>;
 
-  constructor(public dialog: MatDialog, private authService: AuthService, private userService: UserService, private roomService: RoomsService) { }
+  constructor(public dialog: MatDialog) { }
 
-  openWelcomDialog(inviteRoom: string) {
+  openWelcomDialog() {
     this.dialogRef = this.dialog.open(WelcomeDialogComponent, {
       width: "250px",
       disableClose: true,
     });
-
-    this.dialogRef
-      .afterClosed()
-      .pipe(filter(Boolean), take(1))
-      .subscribe((result) => {
-        // this.userService.createVisitor(result as string, inviteRoom);
-        if (inviteRoom) {
-          this.roomService.joinRoom
-        } else {
-          this.openRoomsDialog();
-        }
-      });
   }
 
   openRoomsDialog() {

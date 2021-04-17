@@ -1,5 +1,5 @@
 <app-user-profile></app-user-profile>
-<app-menu [isStartGame]="startGame$ | async" [hasRoom]="hasRoom$ | async" (startGame)="startGame()"
+<app-menu *ngIf="isLogin$ | async" [isStartGame]="startGame$ | async" (startGame)="startGame()"
     (showRooms)="showRooms()"></app-menu>
 <section *ngIf="startGame$ | async" class="players">
     <app-player-card [player]="hostPlayer$ | async"></app-player-card>

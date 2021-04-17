@@ -8,15 +8,14 @@ import { Observable, Subject } from "rxjs";
 })
 export class AuthService {
 
-  userSubject = new Subject()
-  user$: Observable<any> = this.userSubject.asObservable();
+  authStateChangedSubject = new Subject()
+  authStateChanged$: Observable<any> = this.authStateChangedSubject.asObservable();
 
   constructor(
     private afAuth: AngularFireAuth,
   ) {
     this.afAuth.onAuthStateChanged(user => {
-      console.log('onAuthStateChanged', user)
-      this.userSubject.next(user)
+      this.authStateChangedSubject.next(user)
     })
 
   }
