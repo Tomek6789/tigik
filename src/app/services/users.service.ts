@@ -4,81 +4,75 @@ import { AuthService } from "app/auth/auth.service";
 import { User } from "app/auth/user.model";
 import { BehaviorSubject, merge } from "rxjs";
 import { filter, switchMap, tap, map } from "rxjs/operators";
+import { SnackBarService } from "./snackbar.service";
 
 @Injectable({ providedIn: "root" })
 export class UserService {
   constructor(public auth: AuthService, public database: AngularFireDatabase) { }
 
-  user$ = this.auth.user$;
+  authChanged$ = this.auth.authStateChanged$;
   users = this.database.list("users");
 
   user: User;
-  private userDataSubject = new BehaviorSubject<User>(null);
-  public userData$ = this.userDataSubject.asObservable();
+  private authUserSubject = new BehaviorSubject<string>(null);
+  public authUserUid$ = this.authUserSubject.asObservable()
+
+  public user$ = this.authUserUid$.pipe(
+    filter<string>(Boolean),
+    switchMap(userUid => this.onUserStateChanged(userUid)));
+
+  onUserStateChanged(uid: string) {
+    return this.database
+      .list<User>("users", (ref) => ref.orderByKey().equalTo(uid))
+      .valueChanges()
+      .pipe(
+        map(([user]) => user),
+        tap(user => this.user = user)
+      )
+  }
 
 
-  signIn$ = this.user$.pipe(
+  signIn$ = this.authChanged$.pipe(
     filter<User>(Boolean),
-    switchMap((user) => {
-      console.log(user, 'SIGNIN')
+    tap((user) => {
       this.user = {
         uid: user.uid,
         displayName: user.displayName || 'Annonymous'
       }
-      this.userDataSubject.next(this.user)
-      return this.database.list("users").update(user.uid, this.user);
-    })
+      this.authUserSubject.next(user.uid);
+      this.database.list("users").update(user.uid, this.user);
+    }),
   );
 
-  logoutUser$ = this.user$.pipe(
+  logoutUser$ = this.authChanged$.pipe(
     filter((user) => !user),
     tap((userA) => {
       console.log('LOGOUT', userA)
       if (this.user && this.user.role) {
         const key = this.user.role === "host" ? "hostUser" : "guestUser";
         // remove user from room
-        this.database.list("rooms").update(this.user.room, { [key]: null });
+        this.database.list("rooms").update(this.user.roomUid, { [key]: null, startGame: false });
         this.updateRoomAndRole(null, null);
       }
 
       this.user = null;
-      this.userDataSubject.next(null)
-    })
+      this.authUserSubject.next(null)
+    }),
+
   );
 
   userApp$ = merge(this.signIn$, this.logoutUser$);
 
   updateBestScore(score: number) {
-    if (!this.user) {
-      console.log(
-        "Jestes wylogowany, zaloguj sie jesli chcesz zapisywac wynik"
-      );
-      return;
-    }
     this.users.update(this.user.uid, { bestScore: score });
   }
 
   updateScore(score: number) {
-    if (!this.user) {
-      console.log(
-        "Jestes wylogowany, zaloguj sie jesli chcesz zapisywac wynik"
-      );
-      return;
-    }
     this.users.update(this.user.uid, { score });
   }
 
-  updateRoomAndRole(room: string, role: "host" | "guest") {
-    if (this.user) {
-      this.users.update(this.user.uid, { room, role });
-    }
+  updateRoomAndRole(roomUid: string, role: "host" | "guest") {
+    this.users.update(this.user.uid, { roomUid, role });
   }
 
-  getUser(uid: string) {
-    console.log(uid)
-    return this.database
-      .list<User>("users", (ref) => ref.orderByKey().equalTo(uid))
-      .valueChanges()
-      .pipe(map(([user]) => user), tap(console.log));
-  }
 }

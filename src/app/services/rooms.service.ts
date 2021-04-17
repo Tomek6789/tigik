@@ -1,7 +1,9 @@
 import { Injectable } from "@angular/core";
 import { AngularFireDatabase } from "@angular/fire/database";
+import { User } from "app/auth/user.model";
 import { UserService } from "app/services/users.service";
-import { filter, map, shareReplay, switchMap } from "rxjs/operators";
+import { BehaviorSubject } from "rxjs";
+import { filter, map, shareReplay, switchMap, tap } from "rxjs/operators";
 
 export interface Room {
   guestUserUid: string;
@@ -30,32 +32,45 @@ export class RoomsService {
 
   myRoom = null;
 
-  myRoom$ = this.userService.userData$.pipe(
-    filter(Boolean),
-    switchMap(({ uid, room }) => {
-      return this.database
-        .list<Room>("rooms", (ref) => {
-          // const key = role === "host" ? "hostUserUid" : "guestUserUid";
-          return ref.orderByChild(`${room}`).equalTo(uid);
-        })
-        .valueChanges();
-    }),
-    map(([myRoom]) => {
-      this.myRoom = myRoom;
+  // trol = new BehaviorSubject(null);
+  // trol$ = this.trol.asObservable();
+  // trolValue = this.trol.getValue();
 
-      return myRoom;
-    }),
-    filter<Room>(Boolean),
-    shareReplay(1)
-  );
+  // public nextRoom(user: User) {
+  //   this.trol.next(user)
+  // }
+
+
+
+
+  // myRoom$ = this.userService.authUser$.pipe(
+  //   filter(Boolean),
+  //   switchMap(({ uid, room }) => {
+  //     console.log('SWITCH MAP', room)
+  //     return this.database
+  //       .list<Room>("rooms", (ref) => {
+  //         // const key = role === "host" ? "hostUserUid" : "guestUserUid";
+  //         return ref.orderByChild(`${room}`).equalTo(uid);
+  //       })
+  //       .valueChanges();
+  //   }),
+  //   map(([myRoom]) => {
+  //     this.myRoom = myRoom;
+
+  //     console.log('myROOm', myRoom)
+  //     return myRoom;
+  //   }),
+  //   filter<Room>(Boolean),
+  //   shareReplay(1)
+  // );
 
   joinRoom(key: string, guestUid: string) {
     this.rooms.update(key, { guestUserUid: guestUid });
   }
 
-  createRoom(uid: string) {
+  createRoom(hostUid: string) {
     return this.rooms.push({
-      hostUserUid: uid,
+      hostUserUid: hostUid,
       guestUserUid: null,
       startGame: false,
       searchingElement: null,
@@ -79,5 +94,13 @@ export class RoomsService {
 
   searchingElement(key: string, element: string) {
     this.rooms.update(key, { searchingElement: element });
+  }
+
+  onMyRoomStateChanged(roomUid, playerUid) {
+    return this.database
+      .list<Room>("rooms", (ref) => {
+        return ref.orderByKey().equalTo(roomUid);
+      })
+      .valueChanges().pipe(map(([room]) => room));
   }
 }

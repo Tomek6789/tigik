@@ -4,7 +4,7 @@ export interface User {
   elementSelected?: string;
   score?: number;
   bestScore?: number;
-  room?: string;
+  roomUid?: string;
   role?: "host" | "guest";
   isVisitor?: boolean;
 

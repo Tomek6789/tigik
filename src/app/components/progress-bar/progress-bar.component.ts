@@ -16,7 +16,7 @@ export class ProgressBarComponent implements OnInit {
   @Output() finish: EventEmitter<boolean> = new EventEmitter();
 
   ngOnInit() {
-    let timer$ = timer(0, 1000).pipe(
+    let timer$ = timer(0, 50).pipe(
       take(101),
       tap((x) => {
         if (x === 100) {

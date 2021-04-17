@@ -6,14 +6,6 @@
     Invite player
   </button>
   <button mat-raised-button mat-dialog-close>Close</button>
-  <!-- <button
-    mat-raised-button
-    color="accent"
-    [disabled]="!shoes.selectedOptions.selected[0]?.value"
-    (click)="onStartGame()"
-  >
-    Start Game
-  </button> -->
 </div>
 
 <p>Dostepne pokoje</p>
@@ -29,8 +21,8 @@
         <mat-icon color="warn">face</mat-icon>
         <div matLine>{{ room.guestUserUid }}</div>
       </div> -->
-      <!-- <app-player-card [player]="getPlayer(room.hostUserUid) | async"></app-player-card>
-      <app-player-card [player]="getPlayer(room.guestUserUid) | async"></app-player-card> -->
+      <app-player-card [player]="getPlayer(room.hostUserUid) | async"></app-player-card>
+      <app-player-card [player]="getPlayer(room.guestUserUid) | async"></app-player-card>
       <div>
         <button *ngIf="!(hasRoom$ | async)" mat-button color="primary" (click)="onJoinRoom(room.key)">
           <mat-icon>add</mat-icon>

@@ -14,7 +14,7 @@ export class UserProfileComponent {
   constructor(public auth: AuthService) { }
 
   ngOnInit() {
-    this.sub.add(this.auth.user$.subscribe((user) => {
+    this.sub.add(this.auth.authStateChanged$.subscribe((user) => {
       this.show = !!user
       this.user = user
     }))

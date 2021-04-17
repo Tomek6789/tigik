@@ -1,13 +1,13 @@
+import { Clipboard } from "@angular/cdk/clipboard";
 import { Component, EventEmitter, OnDestroy } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
+import { Router, UrlSerializer } from "@angular/router";
 import { User } from "app/auth/user.model";
 import { Room, RoomsService } from "app/services/rooms.service";
 import { SnackBarService } from "app/services/snackbar.service";
 import { UserService } from "app/services/users.service";
-import { iif, Observable, of, Subject } from "rxjs";
-import { filter, takeUntil, take, pluck, tap } from "rxjs/operators";
-import { Clipboard } from "@angular/cdk/clipboard";
-import { Router, UrlSerializer } from "@angular/router";
+import { Subject } from "rxjs";
+import { filter, pluck, take } from "rxjs/operators";
 
 export interface DialogData {
   rooms: Room[];
@@ -34,14 +34,13 @@ export class RoomsDialogComponent implements OnDestroy {
   actions = new EventEmitter<Actions>();
 
   rooms$ = this.roomsService.rooms$;
-  user$ = this.userService.userData$;
+  user$ = this.userService.user$;
 
   hasRoom$ = this.user$.pipe(
     pluck("room"),
   );
 
   private destroy$ = new Subject();
-
 
   constructor(
     private router: Router,
@@ -54,6 +53,9 @@ export class RoomsDialogComponent implements OnDestroy {
   ) { }
 
 
+  getPlayer(uid: string) {
+    return this.userService.onUserStateChanged(uid)
+  }
 
   ngOnDestroy() {
     this.destroy$.next(true);
@@ -90,7 +92,6 @@ export class RoomsDialogComponent implements OnDestroy {
   }
 
   onInvitePlayer(roomKey: string) {
-    console.log(roomKey, 'roomKey')
     const tree = this.router.createUrlTree([], { queryParams: { room: roomKey } });
 
     this.clipboard.copy(`http://localhost:4200${this.serializer.serialize(tree)}`);
@@ -102,7 +103,7 @@ export class RoomsDialogComponent implements OnDestroy {
       this.snackBarService.openSnackBar("Login or play as guest");
       return false;
     }
-    if (user.room) {
+    if (user.roomUid) {
       this.snackBarService.openSnackBar(
         "You already have room, invite someone to play with you"
       );
@@ -110,26 +111,4 @@ export class RoomsDialogComponent implements OnDestroy {
     }
     return true;
   }
-
-  // onJoinRoom(key: string) {
-  //   this.actions.emit({
-  //     key,
-  //     type: ActionsTypes.JOIN,
-  //   });
-  // }
-
-  // onDeleteRoom(key: string) {
-  //   this.actions.emit({
-  //     key,
-  //     type: ActionsTypes.DELETE,
-  //   });
-  // }
-
-  onStartGame() {
-    this.actions.emit({
-      type: ActionsTypes.START,
-    });
-  }
-
-  invitePlayer(key: string) { }
 }
