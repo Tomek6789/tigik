@@ -1,12 +1,14 @@
+import { Clipboard } from "@angular/cdk/clipboard";
 import { Component, HostListener, OnInit } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
-import { BehaviorSubject, Observable } from "rxjs";
-import { filter, map, pluck, shareReplay, switchMap, take, tap } from "rxjs/operators";
+import { ActivatedRoute, Router, UrlSerializer } from "@angular/router";
+import { combineLatest, Subject } from "rxjs";
+import { filter, map, startWith, take, tap, withLatestFrom } from "rxjs/operators";
+import { AppState } from "./app.state";
+import { User } from "./auth/user.model";
 import { DialogService } from "./dialogs/dialog.service";
-import { Element } from "./models/element";
 import { LotteryService } from "./services/lottery.service";
-import { PeriodicTableService } from "./services/periodic-table.service";
 import { RoomsService } from "./services/rooms.service";
+import { SnackBarService } from "./services/snackbar.service";
 import { UserService } from "./services/users.service";
 
 @Component({
@@ -15,104 +17,102 @@ import { UserService } from "./services/users.service";
   styleUrls: ["./app.component.css"],
 })
 export class AppComponent implements OnInit {
+  userSelectedElementSubject = new Subject<string>()
   searchingElement: string;
-  table$: Observable<Element[]> = this.periodicTableService.getPeriodicTable();
-  level$ = new BehaviorSubject("One");
-
-  rooms$ = this.roomsService.rooms$;
-
-  isLogin$ = this.userService.authUserUid$.pipe(map(Boolean))
-  user$ = this.userService.user$
-
-
-
-  myRoom$ = this.user$.pipe(
-    filter((user) => Boolean(user.roomUid)),
-
-    switchMap(user => this.roomsService.onMyRoomStateChanged(user.roomUid, user.uid)))
-  startGame$ = this.myRoom$.pipe(
-    pluck("startGame"),
-    shareReplay(1))
-
-  periodicTableRoom$ = this.myRoom$.pipe(
-    map(({ startGame, searchingElement }) => ({ startGame, searchingElement }))
-  );
-
-  score$ = this.myRoom$.pipe(pluck('score'))
+  periodicTableRoom$ = this.appState.periodicTableRoom$
+  table$ = this.appState.table$;
+  level$ = this.appState.level$
+  inviteRoomUid$ = this.activatedRoute.queryParams.pipe(map(a => a.room), filter<string>(Boolean))
+  //user
+  isLogin$ = this.appState.isLogin$
+  user$ = this.appState.user$
+  userUid$ = this.appState.userUid$;
+  userRoom$ = this.appState.userRoom$
+  userRoomUid$ = this.appState.userRoomUid$;
+  hasRoom$ = this.appState.hasRoom$
+  role$ = this.appState.role$;
+  score$ = this.appState.score$;
+  isBestScore$ = this.appState.isBestScore$;
 
 
-
+  //room
+  rooms$ = this.appState.rooms$;
+  startGame$ = this.appState.startGame$
+  playersInRooms$ = this.appState.playersInRooms$
+  hostPlayer$ = this.appState.hostPlayer$;
+  guestPlayer$ = this.appState.guestPlayer$;
+  searchingElementChanged$ = this.appState.searchingElementChanged$;
 
 
   @HostListener("window:beforeunload", ["$event"])
   unloadHandler(event) {
-    this.user$.pipe(take(1)).subscribe((user) => {
+    combineLatest([
+      this.userRoomUid$,
+      this.role$
+    ]).subscribe(([roomUid, role]) => {
       this.userService.updateRoomAndRole(null, null);
-      this.roomsService.removeRoom(user.roomUid);
-      const role = user.role === "host" ? "hostUserUid" : "guestUserUid";
-      this.roomsService.removeUserFromRoom(user.roomUid, role);
+      this.roomsService.removeRoom(roomUid);
+      this.roomsService.removeUserFromRoom(roomUid, `${role}Uid`);
     });
   }
 
   constructor(
+    private appState: AppState,
     private activatedRoute: ActivatedRoute,
-    private periodicTableService: PeriodicTableService,
     private userService: UserService,
     private roomsService: RoomsService,
     private lotteryService: LotteryService,
-
-    private dialogService: DialogService
+    private snackBarService: SnackBarService,
+    private dialogService: DialogService,
+    private router: Router,
+    private serializer: UrlSerializer,
+    private clipboard: Clipboard,
   ) { }
-
-  hostPlayer$ = this.myRoom$.pipe(
-    switchMap((myRoom) => this.userService.onUserStateChanged(myRoom.hostUserUid))
-  );
-
-  guestPlayer$ = this.myRoom$.pipe(
-    filter((room) => Boolean(room.guestUserUid)),
-    switchMap(({ guestUserUid }) => this.userService.onUserStateChanged(guestUserUid))
-  );
 
   ngOnInit() {
     // Start App
     this.userService.userApp$.subscribe();
 
-
-    this.activatedRoute.queryParams.pipe(map(a => a.room), filter<string>(Boolean)).subscribe(roomUid => {
-      this.user$.pipe(filter<any>(Boolean)).subscribe(u => {
-        this.userService.updateRoomAndRole(roomUid, 'guest')
-        this.roomsService.joinRoom(roomUid, u.uid)
-      })
+    combineLatest([this.inviteRoomUid$, this.userUid$]).subscribe(([roomUid, uid]) => {
+      console.log('USER UID', uid)
+      this.userService.updateRoomAndRole(roomUid, 'guest')
+      this.roomsService.joinRoom(roomUid, uid)
     });
 
+    //game
+    this.userSelectedElementSubject.asObservable().pipe(
+      withLatestFrom(combineLatest([
+        this.searchingElementChanged$,
+        this.score$.pipe(startWith(null)),
+        this.userRoomUid$
+      ])),
+      filter(([userSelectedElement, [roomElement]]) => userSelectedElement === roomElement),
+      tap(([userSelectedElement, [a, score, userRoomUid]]) => {
+        this.roomsService.searchingElement(userRoomUid, this.randomElement(score));
+        this.userService.updateScore(score += 10);
 
+      })
+    ).subscribe()
   }
 
   handleFinish() {
-    this.user$.pipe(take(1)).subscribe(({ roomUid, score, bestScore = 0 }) => {
+    this.userRoomUid$.pipe(take(1)).subscribe(roomUid => {
       this.roomsService.startGame(roomUid, false, null);
+      this.userService.updateScore(0);
+    })
 
-      if (score >= bestScore) {
-        this.userService.updateBestScore(score);
-      }
-      this.userService.updateScore(0)
-    });
-
+    this.isBestScore$.subscribe(bestScore => {
+      this.userService.updateBestScore(bestScore)
+    })
   }
 
   handleSelected(symbol: string) {
-    if (symbol === this.searchingElement) {
-      this.user$.pipe(take(1)).subscribe(({ roomUid, score }) => {
-        this.roomsService.searchingElement(roomUid, this.randomElement(score));
-        this.userService.updateScore(score += 10);
-        this.level$.next("a");
-      });
-    }
+    this.userSelectedElementSubject.next(symbol)
   }
 
 
   startGame() {
-    this.user$.pipe(tap(console.log), take(1)).subscribe((user) => {
+    this.user$.pipe(take(1)).subscribe((user) => {
       let roomUid = user.roomUid;
       if (!user.roomUid) {
         const room = this.roomsService.createRoom(user.uid)
@@ -130,7 +130,52 @@ export class AppComponent implements OnInit {
     return this.searchingElement
   }
 
-  showRooms() {
-    this.dialogService.openRoomsDialog();
+  showRooms(data: any) {
+    this.dialogService.openRoomsDialog({ data: { trol: 'trol' } });
+  }
+
+  onCreateRoom() {
+    this.user$
+      .pipe(
+        take(1),
+      )
+      .subscribe((user) => {
+        const room = this.roomsService.createRoom(user.uid);
+        this.userService.updateRoomAndRole(room.key, "host");
+      });
+  }
+
+  onInvitePlayer(roomKey: string) {
+    console.log(roomKey)
+    const tree = this.router.createUrlTree([], { queryParams: { room: roomKey } });
+
+    this.clipboard.copy(`http://localhost:4200${this.serializer.serialize(tree)}`);
+    this.snackBarService.openSnackBar("Send this link to your friend");
+  }
+
+  onDeleteRoom(roomKey: string) {
+    this.userService.updateRoomAndRole(null, null);
+    this.roomsService.removeRoom(roomKey);
+  }
+
+  onJoinRoom(roomKey: string) {
+    this.user$
+      .pipe(
+        take(1),
+        filter((user) => this.validateUser(user))
+      )
+      .subscribe((user) => {
+        this.roomsService.joinRoom(roomKey, user.uid);
+        this.userService.updateRoomAndRole(roomKey, "guest");
+      });
+  }
+
+  private validateUser(user: User): boolean {
+    if (!user) {
+      this.snackBarService.openSnackBar("Login or play as guest");
+      return false;
+    }
+    return true;
   }
 }
+

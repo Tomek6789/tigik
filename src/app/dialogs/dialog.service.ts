@@ -22,9 +22,10 @@ export class DialogService {
     });
   }
 
-  openRoomsDialog() {
+  openRoomsDialog(data: any) {
     this.dialogRef = this.dialog.open(RoomsDialogComponent, {
       width: "1200px",
+      data
     });
   }
 

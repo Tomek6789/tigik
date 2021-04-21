@@ -1,14 +1,12 @@
+export type Role = "host" | "guest";
+
 export interface User {
   uid: string;
   email?: string;
-  elementSelected?: string;
   score?: number;
   bestScore?: number;
   roomUid?: string;
-  role?: "host" | "guest";
-  isVisitor?: boolean;
-
+  role?: Role;
   photoURL?: string;
   displayName?: string;
-  myCustomData?: string;
 }

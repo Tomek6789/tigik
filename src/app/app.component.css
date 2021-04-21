@@ -3,6 +3,10 @@
   justify-content: space-evenly;
 }
 
+mat-drawer {
+  width: 100vh;
+}
+
 .text h1 {
   text-align: center;
   color: lightslategray;

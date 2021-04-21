@@ -3,8 +3,7 @@ import { AngularFireDatabase } from "@angular/fire/database";
 import { AuthService } from "app/auth/auth.service";
 import { User } from "app/auth/user.model";
 import { BehaviorSubject, merge } from "rxjs";
-import { filter, switchMap, tap, map } from "rxjs/operators";
-import { SnackBarService } from "./snackbar.service";
+import { filter, switchMap, tap, map, take } from "rxjs/operators";
 
 @Injectable({ providedIn: "root" })
 export class UserService {
@@ -19,7 +18,9 @@ export class UserService {
 
   public user$ = this.authUserUid$.pipe(
     filter<string>(Boolean),
-    switchMap(userUid => this.onUserStateChanged(userUid)));
+    switchMap(userUid => this.onUserStateChanged(userUid)),
+    filter<User>(Boolean)
+  );
 
   onUserStateChanged(uid: string) {
     return this.database
@@ -31,6 +32,9 @@ export class UserService {
       )
   }
 
+  getUser(uid: string) {
+    return this.database.list<User>('users', ref => ref.orderByKey().equalTo(uid)).valueChanges().pipe(take(1), tap(console.log), map(([user]) => user))
+  }
 
   signIn$ = this.authChanged$.pipe(
     filter<User>(Boolean),
