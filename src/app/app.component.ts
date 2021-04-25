@@ -18,10 +18,8 @@ import { UserService } from "./services/users.service";
 })
 export class AppComponent implements OnInit {
   userSelectedElementSubject = new Subject<string>()
-  searchingElement: string;
   periodicTableRoom$ = this.appState.periodicTableRoom$
   table$ = this.appState.table$;
-  level$ = this.appState.level$
   inviteRoomUid$ = this.activatedRoute.queryParams.pipe(map(a => a.room), filter<string>(Boolean))
   //user
   isLogin$ = this.appState.isLogin$
@@ -74,7 +72,6 @@ export class AppComponent implements OnInit {
     this.userService.userApp$.subscribe();
 
     combineLatest([this.inviteRoomUid$, this.userUid$]).subscribe(([roomUid, uid]) => {
-      console.log('USER UID', uid)
       this.userService.updateRoomAndRole(roomUid, 'guest')
       this.roomsService.joinRoom(roomUid, uid)
     });
@@ -126,12 +123,11 @@ export class AppComponent implements OnInit {
   }
 
   private randomElement(score: number): string {
-    this.searchingElement = this.lotteryService.drawElement(score);
-    return this.searchingElement
+    return this.lotteryService.drawElement(score)
   }
 
-  showRooms(data: any) {
-    this.dialogService.openRoomsDialog({ data: { trol: 'trol' } });
+  showRooms() {
+    this.dialogService.openRoomsDialog();
   }
 
   onCreateRoom() {

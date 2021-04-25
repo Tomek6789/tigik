@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, combineLatest, forkJoin, from, merge, Observable, of } from "rxjs";
-import { distinctUntilChanged, filter, map, mergeMap, pluck, scan, shareReplay, switchMap, toArray } from "rxjs/operators";
+import { combineLatest, forkJoin, from, merge, Observable, of } from "rxjs";
+import { concatMap, distinctUntilChanged, filter, map, pluck, shareReplay, switchMap, toArray } from "rxjs/operators";
 import { Role, User } from "./auth/user.model";
 import { Element } from "./models/element";
 import { PeriodicTableService } from "./services/periodic-table.service";
@@ -18,9 +18,7 @@ export interface RoomsPlayers {
 })
 export class AppState {
     table$: Observable<Element[]> = this.periodicTableService.getPeriodicTable();
-    level$ = new BehaviorSubject("One");
 
-    rooms$ = this.roomsService.rooms$;
 
     //user
     isLogin$ = this.userService.authUserUid$.pipe(map(Boolean))
@@ -36,34 +34,32 @@ export class AppState {
         map(([score]) => score)
     );
 
-
     //room
-    userRoom$ = this.user$.pipe(
-        filter((user) => Boolean(user.roomUid)),
-        switchMap(user => this.roomsService.onMyRoomStateChanged(user.roomUid)),
+    rooms$ = this.roomsService.rooms$;
+
+    userRoom$ = this.userRoomUid$.pipe(
+        switchMap(roomUid => this.roomsService.onMyRoomStateChanged(roomUid)),
         filter((room) => Boolean(room)),
         shareReplay(1),
     )
-
     startGame$ = this.userRoom$.pipe(
         pluck("startGame")
     )
     periodicTableRoom$ = this.userRoom$.pipe(
         map(({ startGame, searchingElement }) => ({ startGame, searchingElement })),
     );
-    searchingElementChanged$ = this.userRoom$.pipe(pluck('searchingElement'))
+    searchingElementChanged$ = this.userRoom$.pipe(pluck('searchingElement'));
 
     private roomPlayers$ = this.rooms$.pipe(
         switchMap(rooms => from(rooms).pipe(
-            mergeMap(({ guestUid, hostUid, key }) => {
+            concatMap(({ guestUid, hostUid, key }) => {
                 return forkJoin({
                     roomUid: of(key),
                     guest: guestUid ? this.userService.getUser(guestUid) : of(null),
                     host: hostUid ? this.userService.getUser(hostUid) : of(null)
-                }).pipe(toArray())
+                })
             }),
-            // map(a => [a]),
-            scan((acc, curr) => [...acc, ...curr], [] as RoomsPlayers[])
+            toArray()
         )),
     )
     private emptyRooms$ = this.rooms$.pipe(filter(a => !a.length))
@@ -71,12 +67,16 @@ export class AppState {
     playersInRooms$ = merge(this.roomPlayers$, this.emptyRooms$)
 
     hostPlayer$ = this.userRoom$.pipe(
-        switchMap((myRoom) => this.userService.onUserStateChanged(myRoom.hostUid))
+        pluck('hostUid'),
+        distinctUntilChanged(),
+        switchMap((hostUid) => this.userService.onUserStateChanged(hostUid))
     );
 
     guestPlayer$ = this.userRoom$.pipe(
-        filter((room) => Boolean(room.guestUid)),
-        switchMap(({ guestUid }) => this.userService.onUserStateChanged(guestUid))
+        pluck('guestUid'),
+        distinctUntilChanged(),
+        filter((guestUid) => Boolean(guestUid)),
+        switchMap((guestUid) => this.userService.onUserStateChanged(guestUid))
     );
 
 

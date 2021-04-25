@@ -33,7 +33,7 @@ export class UserService {
   }
 
   getUser(uid: string) {
-    return this.database.list<User>('users', ref => ref.orderByKey().equalTo(uid)).valueChanges().pipe(take(1), tap(console.log), map(([user]) => user))
+    return this.database.list<User>('users', ref => ref.orderByKey().equalTo(uid)).valueChanges().pipe(take(1), map(([user]) => user))
   }
 
   signIn$ = this.authChanged$.pipe(

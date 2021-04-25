@@ -5,10 +5,10 @@ import { map, tap } from "rxjs/operators";
 
 export interface Room {
   key?: string;
-  guestUid: string;
-  hostUid: string;
-  startGame: boolean;
-  searchingElement: string;
+  guestUid?: string;
+  hostUid?: string;
+  startGame?: boolean;
+  searchingElement?: string;
 }
 
 export type PeriodicTableRoom = Pick<Room, "startGame" | "searchingElement">;
@@ -61,7 +61,7 @@ export class RoomsService {
     this.rooms.update(key, { searchingElement: element });
   }
 
-  onMyRoomStateChanged(roomUid) {
+  onMyRoomStateChanged(roomUid: string) {
     return this.database
       .list<Room>("rooms", (ref) => {
         return ref.orderByKey().equalTo(roomUid);

@@ -3,7 +3,5 @@ WARNING: Illegal reflective access by io.netty.util.internal.ReflectionUtil (fil
 WARNING: Please consider reporting this to the maintainers of io.netty.util.internal.ReflectionUtil
 WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
 WARNING: All illegal access operations will be denied in a future release
-21:41:28.195 [NamespaceSystem-akka.actor.default-dispatcher-4] INFO akka.event.slf4j.Slf4jLogger - Slf4jLogger started
-21:41:28.361 [main] INFO com.firebase.server.forge.App$ - Listening at localhost:9000
-23:34:22.829 [NamespaceSystem-akka.actor.default-dispatcher-54] INFO akka.actor.LocalActorRef - Message [com.firebase.core.namespace.client.DataPush] to Actor[akka://NamespaceSystem/user/tigik-8d88c/$dc#-1635474572] was not delivered. [1] dead letters encountered. If this is not an expected behavior then Actor[akka://NamespaceSystem/user/tigik-8d88c/$dc#-1635474572] may have terminated unexpectedly. This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
-23:34:22.832 [NamespaceSystem-akka.actor.default-dispatcher-54] INFO akka.actor.DeadLetterActorRef - Message [com.firebase.core.namespace.TooManyRequestsWithDelay] from Actor[akka://NamespaceSystem/user/$a#1610085068] to Actor[akka://NamespaceSystem/deadLetters] was not delivered. [2] dead letters encountered. If this is not an expected behavior then Actor[akka://NamespaceSystem/deadLetters] may have terminated unexpectedly. This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' and 'akka.log-dead-letters-during-shutdown'.
+20:48:27.282 [NamespaceSystem-akka.actor.default-dispatcher-4] INFO akka.event.slf4j.Slf4jLogger - Slf4jLogger started
+20:48:27.449 [main] INFO com.firebase.server.forge.App$ - Listening at localhost:9000
