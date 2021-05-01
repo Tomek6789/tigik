@@ -30,6 +30,7 @@ import { UserService } from "./services/users.service";
 import { PeriodicTableComponent } from "./components/periodic-table/periodic-table.component";
 import { MenuComponent } from "./components/menu/menu.component";
 import { PlayerCardComponent } from './components/player-card/player-card.component';
+import { MatSidenavModule } from '@angular/material/sidenav';
 
 import { environment } from '../environments/environment';
 
@@ -52,6 +53,7 @@ import { environment } from '../environments/environment';
     ReactiveFormsModule,
     MatProgressBarModule,
     MatCardModule,
+    MatSidenavModule,
     MatButtonModule,
     MatSnackBarModule,
     MatDialogModule,

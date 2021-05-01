@@ -1,33 +1,24 @@
 <div class="box">
-  <button mat-raised-button color="primary" (click)="onCreateRoom()">
+  <button *ngIf="!hasRoom" mat-raised-button color="primary" (click)="onCreateRoom()">
     Create Room
   </button>
   <button mat-raised-button color="primary" (click)="onInvitePlayer(shoes.selectedOptions.selected[0]?.value)">
     Invite player
   </button>
-  <button mat-raised-button mat-dialog-close>Close</button>
+  <button mat-raised-button (click)="closeRooms()">Close</button>
 </div>
 
-<p>Dostepne pokoje</p>
-
 <mat-selection-list #shoes [multiple]="false">
-  <mat-list-option *ngFor="let room of rooms$ | async" [value]="room.key">
-    <div *ngIf="room.hostUserUid" class="box">
-      <!-- <div>
-        <mat-icon color="primary">face</mat-icon>
-        <div matLine>{{ room.hostUserUid }}</div>
-      </div>
+  <mat-list-option *ngFor="let room of rooms" [value]="room?.roomUid">
+    <div class="box">
+      <app-player-card [player]="room?.host"></app-player-card>
+      <app-player-card [player]="room?.guest"></app-player-card>
       <div>
-        <mat-icon color="warn">face</mat-icon>
-        <div matLine>{{ room.guestUserUid }}</div>
-      </div> -->
-      <app-player-card [player]="getPlayer(room.hostUserUid) | async"></app-player-card>
-      <app-player-card [player]="getPlayer(room.guestUserUid) | async"></app-player-card>
-      <div>
-        <button *ngIf="!(hasRoom$ | async)" mat-button color="primary" (click)="onJoinRoom(room.key)">
+        ROOM UID {{ room.roomUid }}
+        <button mat-button color="primary" (click)="onJoinRoom(room?.roomUid)">
           <mat-icon>add</mat-icon>
         </button>
-        <button mat-button color="primary" (click)="onDeleteRoom(room.key)">
+        <button *ngIf="room?.roomUid === userRoomUid" mat-button color="primary" (click)="onDeleteRoom(room?.roomUid)">
           <mat-icon>delete</mat-icon>
         </button>
       </div>

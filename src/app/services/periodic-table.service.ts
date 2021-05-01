@@ -6,7 +6,7 @@ import { Element } from "app/models/element";
 
 @Injectable()
 export class PeriodicTableService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   public getPeriodicTable() {
     return this.http

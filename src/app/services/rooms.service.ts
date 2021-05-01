@@ -1,15 +1,14 @@
 import { Injectable } from "@angular/core";
 import { AngularFireDatabase } from "@angular/fire/database";
 import { User } from "app/auth/user.model";
-import { UserService } from "app/services/users.service";
-import { BehaviorSubject } from "rxjs";
-import { filter, map, shareReplay, switchMap, tap } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 
 export interface Room {
-  guestUserUid: string;
-  hostUserUid: string;
-  startGame: boolean;
-  searchingElement: string;
+  key?: string;
+  guestUid?: string;
+  hostUid?: string;
+  startGame?: boolean;
+  searchingElement?: string;
 }
 
 export type PeriodicTableRoom = Pick<Room, "startGame" | "searchingElement">;
@@ -20,58 +19,24 @@ export type PeriodicTableRoom = Pick<Room, "startGame" | "searchingElement">;
 export class RoomsService {
   constructor(
     private database: AngularFireDatabase,
-    private userService: UserService
   ) { }
 
   rooms = this.database.list<Room>("rooms");
   rooms$ = this.rooms.snapshotChanges().pipe(
     map((data) => {
       return data.map((c) => ({ key: c.payload.key, ...c.payload.val() }));
-    })
+    }),
+    tap(() => console.log('snapshot'))
   );
 
-  myRoom = null;
-
-  // trol = new BehaviorSubject(null);
-  // trol$ = this.trol.asObservable();
-  // trolValue = this.trol.getValue();
-
-  // public nextRoom(user: User) {
-  //   this.trol.next(user)
-  // }
-
-
-
-
-  // myRoom$ = this.userService.authUser$.pipe(
-  //   filter(Boolean),
-  //   switchMap(({ uid, room }) => {
-  //     console.log('SWITCH MAP', room)
-  //     return this.database
-  //       .list<Room>("rooms", (ref) => {
-  //         // const key = role === "host" ? "hostUserUid" : "guestUserUid";
-  //         return ref.orderByChild(`${room}`).equalTo(uid);
-  //       })
-  //       .valueChanges();
-  //   }),
-  //   map(([myRoom]) => {
-  //     this.myRoom = myRoom;
-
-  //     console.log('myROOm', myRoom)
-  //     return myRoom;
-  //   }),
-  //   filter<Room>(Boolean),
-  //   shareReplay(1)
-  // );
-
   joinRoom(key: string, guestUid: string) {
-    this.rooms.update(key, { guestUserUid: guestUid });
+    this.rooms.update(key, { guestUid });
   }
 
   createRoom(hostUid: string) {
     return this.rooms.push({
-      hostUserUid: hostUid,
-      guestUserUid: null,
+      hostUid,
+      guestUid: null,
       startGame: false,
       searchingElement: null,
     });
@@ -96,7 +61,7 @@ export class RoomsService {
     this.rooms.update(key, { searchingElement: element });
   }
 
-  onMyRoomStateChanged(roomUid, playerUid) {
+  onMyRoomStateChanged(roomUid: string) {
     return this.database
       .list<Room>("rooms", (ref) => {
         return ref.orderByKey().equalTo(roomUid);
