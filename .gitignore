@@ -33,6 +33,7 @@ npm-debug.log
 testem.log
 /typings
 *.log
+database-debug.log
 
 # e2e
 /e2e/*.js
