@@ -2,7 +2,7 @@
 
     <mat-drawer #drawer mode="over">
         <app-rooms-dialog [rooms]="playersInRooms$ | async" [hasRoom]="hasRoom$ | async"
-            [userRoomUid]="userRoomUid$ | async" (close)="drawer.close()" (createRoom)="onCreateRoom()"
+            [userRoomUid]="userRoomUid$ | async" (closeRooms)="drawer.close()" (createRoom)="onCreateRoom()"
             (invitePleyer)="onInvitePlayer($event)" (deleteRoom)="onDeleteRoom($event)" (joinRoom)="onJoinRoom($event)">
         </app-rooms-dialog>
     </mat-drawer>

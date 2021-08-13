@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { AuthService } from "app/auth/auth.service";
 import { Subscription } from "rxjs";
 
@@ -7,7 +7,7 @@ import { Subscription } from "rxjs";
   templateUrl: "./user-profile.component.html",
   styleUrls: ["./user-profile.component.css"],
 })
-export class UserProfileComponent {
+export class UserProfileComponent implements OnInit, OnDestroy {
   show: boolean
   user: any
   private sub: Subscription = new Subscription()

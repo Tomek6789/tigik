@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { RoomsPlayers } from "app/app.state";
-import { User } from "app/auth/user.model";
 
 @Component({
   selector: "app-rooms-dialog",
@@ -13,14 +12,14 @@ export class RoomsDialogComponent {
   @Input() hasRoom: boolean;
 
 
-  @Output() close = new EventEmitter()
+  @Output() closeRooms = new EventEmitter()
   @Output() createRoom = new EventEmitter()
   @Output() invitePleyer = new EventEmitter()
   @Output() joinRoom = new EventEmitter()
   @Output() deleteRoom = new EventEmitter()
 
-  closeRooms() {
-    this.close.emit()
+  onCloseRooms() {
+    this.closeRooms.emit()
   }
 
   onJoinRoom(roomUid: string) {
