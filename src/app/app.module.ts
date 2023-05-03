@@ -13,6 +13,8 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatListModule } from "@angular/material/list";
 import { MatIconModule } from "@angular/material/icon";
+import {MatTooltipModule} from '@angular/material/tooltip';
+
 
 import { MatProgressBarModule } from "@angular/material/progress-bar";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
@@ -23,16 +25,15 @@ import { AppComponent } from "./app.component";
 import { AuthGuard } from "./auth/auth.guard";
 import { AuthModule } from "./auth/auth.module";
 import { RoomsDialogComponent } from "./dialogs/rooms-dialog/rooms-dialog.component";
-import { WelcomeDialogComponent } from "./dialogs/welcome-dialog/welcome-dialog.component";
 import { PeriodicTableService } from "./services/periodic-table.service";
 import { ProgressBarComponent } from "./components/progress-bar/progress-bar.component";
 import { UserService } from "./services/users.service";
 import { PeriodicTableComponent } from "./components/periodic-table/periodic-table.component";
 import { MenuComponent } from "./components/menu/menu.component";
-import { PlayerCardComponent } from './components/player-card/player-card.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
 
 import { environment } from '../environments/environment';
+import { ProfileComponent } from "./components/profile/profile.component";
 
 @NgModule({
   imports: [
@@ -61,6 +62,7 @@ import { environment } from '../environments/environment';
     MatInputModule,
     MatListModule,
     MatIconModule,
+    MatTooltipModule,
 
     ClipboardModule,
     AuthModule,
@@ -69,11 +71,10 @@ import { environment } from '../environments/environment';
     AppComponent,
     ProgressBarComponent,
 
-    WelcomeDialogComponent,
+    ProfileComponent,
     RoomsDialogComponent,
     PeriodicTableComponent,
     MenuComponent,
-    PlayerCardComponent,
   ],
   providers: [PeriodicTableService, UserService, AuthGuard],
   bootstrap: [AppComponent],

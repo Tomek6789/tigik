@@ -1,0 +1,22 @@
+img {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    margin-right: 7px;
+}
+
+.flex {
+    display: flex;
+    align-items: center;
+    
+}
+.column {
+    flex-direction: column;
+
+}
+
+.profile-icon {
+    height: 40px;
+    width: 40px;
+    font-size: 40px
+}

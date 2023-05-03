@@ -15,6 +15,7 @@ export class AuthService {
     private afAuth: AngularFireAuth,
   ) {
     this.afAuth.onAuthStateChanged(user => {
+      console.log('INIT',user)
       this.authStateChangedSubject.next(user)
     })
 
@@ -22,16 +23,21 @@ export class AuthService {
 
   async googleSignin() {
     const provider = new firebase.auth.GoogleAuthProvider();
-    await this.afAuth.signInWithPopup(provider);
+    
+    try {
+      return await this.afAuth.signInWithPopup(provider);
+      
+    } catch (error) {
+      // omit error when popup is close by user
+    }
   }
 
 
   async signOut() {
-    await this.afAuth.signOut();
+    return await this.afAuth.signOut();
   }
 
   async annonymus() {
-    const user = await this.afAuth.signInAnonymously();
-
+    return await this.afAuth.signInAnonymously();
   }
 }

@@ -1,7 +1,9 @@
 import { Injectable } from "@angular/core";
 import { AngularFireDatabase } from "@angular/fire/database";
+import { AuthService } from "app/auth/auth.service";
 import { User } from "app/auth/user.model";
-import { map, tap } from "rxjs/operators";
+import { filter, map, switchMap, tap } from "rxjs/operators";
+import { UserService } from "./users.service";
 
 export interface Room {
   key?: string;
@@ -22,18 +24,12 @@ export class RoomsService {
   ) { }
 
   rooms = this.database.list<Room>("rooms");
-  rooms$ = this.rooms.snapshotChanges().pipe(
-    map((data) => {
-      return data.map((c) => ({ key: c.payload.key, ...c.payload.val() }));
-    }),
-    tap(() => console.log('snapshot'))
-  );
 
   joinRoom(key: string, guestUid: string) {
     this.rooms.update(key, { guestUid });
   }
 
-  createRoom(hostUid: string) {
+  createRoom(hostUid: string = 'temporary') {
     return this.rooms.push({
       hostUid,
       guestUid: null,

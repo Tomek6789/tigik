@@ -1,0 +1,31 @@
+<div class="flex">
+
+    <img *ngIf="user?.photoURL else: icon"  [src]="user?.photoURL" [matTooltip]="user?.displayName" />
+
+    <div class="flex column"> 
+
+        <span>
+            <mat-icon color="primary">monitoring</mat-icon>
+            {{ user?.score }}
+        </span>
+        
+        <span>
+            <mat-icon color="primary">rocket_launch</mat-icon>
+            {{ user?.bestScore || 0 }}
+        </span>
+    </div>
+
+    <button *ngIf="showLogout" mat-icon-button >
+        <mat-icon color="primary"(click)="signOut.emit()">
+            logout
+        </mat-icon>
+        
+    </button>
+    </div>
+
+
+    <ng-template #icon>
+        <mat-icon class="profile-icon" color="primary" [matTooltip]="user?.displayName">
+                account_circle
+        </mat-icon>
+    </ng-template>
