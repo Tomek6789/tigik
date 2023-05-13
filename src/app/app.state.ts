@@ -1,8 +1,9 @@
 import { Injectable } from "@angular/core";
 import { combineLatest, forkJoin, from, merge, Observable, of } from "rxjs";
-import { concatMap, distinctUntilChanged, filter, map, pluck, shareReplay, switchMap, toArray } from "rxjs/operators";
+import { concatMap, distinctUntilChanged, filter, map, pluck, shareReplay, switchMap, toArray, startWith, tap, withLatestFrom, take } from "rxjs/operators";
 import { Role, User } from "./auth/user.model";
 import { Element } from "./models/element";
+import { LotteryService } from "./services/lottery.service";
 import { PeriodicTableService } from "./services/periodic-table.service";
 import { RoomsService } from "./services/rooms.service";
 import { UserService } from "./services/users.service";
@@ -21,65 +22,85 @@ export class AppState {
 
 
     //user
-    isLogin$ = this.userService.authUserUid$.pipe(map(Boolean))
+
     user$ = this.userService.user$
     hasRoom$ = this.user$.pipe(pluck('roomUid'), map(Boolean), distinctUntilChanged())
     userRoomUid$ = this.user$.pipe(pluck('roomUid'), filter<string>(Boolean), distinctUntilChanged())
     userUid$ = this.user$.pipe(pluck('uid'), filter<string>(Boolean), distinctUntilChanged())
     role$ = this.user$.pipe(pluck('role'), filter<Role>(Boolean), distinctUntilChanged())
-    score$ = this.user$.pipe(pluck('score'), filter<number>(Boolean), distinctUntilChanged())
-    bestScore$ = this.user$.pipe(pluck('bestScore'), filter<number>(Boolean), distinctUntilChanged())
+    score$ = this.user$.pipe(pluck('score'), distinctUntilChanged())
+    bestScore$ = this.user$.pipe(pluck('bestScore'), distinctUntilChanged())
     isBestScore$ = combineLatest([this.score$, this.bestScore$]).pipe(
-        filter(([score, bestScore]) => score >= bestScore),
+        filter(([score, bestScore]) => score >= bestScore || bestScore == null),
         map(([score]) => score)
     );
 
-    //room
-    rooms$ = this.roomsService.rooms$;
 
-    userRoom$ = this.userRoomUid$.pipe(
-        switchMap(roomUid => this.roomsService.onMyRoomStateChanged(roomUid)),
-        filter((room) => Boolean(room)),
-        shareReplay(1),
-    )
+    userRoom$ = this.roomsService.room$
+    
+
     startGame$ = this.userRoom$.pipe(
         pluck("startGame")
     )
     periodicTableRoom$ = this.userRoom$.pipe(
-        map(({ startGame, searchingElement }) => ({ startGame, searchingElement })),
+        // map(({ startGame, searchingElement }) => ({ startGame, searchingElement })),
     );
     searchingElementChanged$ = this.userRoom$.pipe(pluck('searchingElement'));
 
-    private roomPlayers$ = this.rooms$.pipe(
-        switchMap(rooms => from(rooms).pipe(
-            concatMap(({ guestUid, hostUid, key }) => {
-                return forkJoin({
-                    roomUid: of(key),
-                    guest: guestUid ? this.userService.getUser(guestUid) : of(null),
-                    host: hostUid ? this.userService.getUser(hostUid) : of(null)
-                })
-            }),
-            toArray()
-        )),
-    )
-    private emptyRooms$ = this.rooms$.pipe(filter(a => !a.length))
 
-    playersInRooms$ = merge(this.roomPlayers$, this.emptyRooms$)
+    opponentPlayer$ = combineLatest([this.role$, this.userRoom$]).pipe(
+        map(([logginUserRole, room]) => {
+            const key = logginUserRole === "host" ? "guestUid" : "hostUid";
+            console.log('Oponent:',key)
+            return room[key]
+        }),
+        filter<string>(Boolean), //when guest is not in room
+        switchMap((playerUid) => this.userService.onUserStateChanged(playerUid)),
+    ) 
+    
 
-    hostPlayer$ = this.userRoom$.pipe(
-        pluck('hostUid'),
-        distinctUntilChanged(),
-        switchMap((hostUid) => this.userService.onUserStateChanged(hostUid))
-    );
-
-    guestPlayer$ = this.userRoom$.pipe(
-        pluck('guestUid'),
-        distinctUntilChanged(),
-        filter((guestUid) => Boolean(guestUid)),
-        switchMap((guestUid) => this.userService.onUserStateChanged(guestUid))
-    );
+    constructor(
+        private userService: UserService, 
+        private roomsService: RoomsService, 
+        private periodicTableService: PeriodicTableService,     
+        private lotteryService: LotteryService,
+        ) { 
+    }
 
 
-    constructor(private userService: UserService, private roomsService: RoomsService, private periodicTableService: PeriodicTableService) { }
+    // createRoomUpdateUserRoomAndRole( ) {
+    //     this.user$.pipe(
+    //         take(1),
+    //         tap((user) => {
+    //         const room = this.roomsService.createRoom(user.uid)
+    //         const roomUid = room.key
+    //         this.userService.updateRoomAndRole(roomUid, 'host')
+    //         })
+    //     ).subscribe()
+    // }
+
+    // createRoomUpdateUserRoomAndRoleAndStartGame( ) {
+    //     const room = this.roomsService.createRoom(this.userService.user.uid)
+    //     this.userService.updateRoomAndRole(room.key, 'host')
+    //     this.startGame()
+    // }
+
+    startGame() {
+        this.userRoomUid$.pipe(
+            take(1),
+            tap((roomUid) => {
+                console.log(roomUid)
+                // this.roomsService.startGame(roomUid, true, this.randomElement(0));
+
+            })
+        ).subscribe()
+
+    }
+
+    // game(score: number) {
+    //     this.roomsService.searchingElement(this.randomElement(score));
+    //     this.userService.updateScore(score += 10);
+
+    // }
 
 }

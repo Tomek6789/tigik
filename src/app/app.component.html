@@ -1,25 +1,21 @@
-<mat-drawer-container>
 
-    <mat-drawer #drawer mode="over">
-        <app-rooms-dialog [rooms]="playersInRooms$ | async" [hasRoom]="hasRoom$ | async"
-            [userRoomUid]="userRoomUid$ | async" (closeRooms)="drawer.close()" (createRoom)="onCreateRoom()"
-            (invitePleyer)="onInvitePlayer($event)" (deleteRoom)="onDeleteRoom($event)" (joinRoom)="onJoinRoom($event)">
-        </app-rooms-dialog>
-    </mat-drawer>
 
-    <mat-drawer-content>
-        <app-user-profile></app-user-profile>
-        <app-menu *ngIf="isLogin$ | async" [isStartGame]="startGame$ | async" (startGame)="startGame()"
-            (showRooms)="drawer.open()"></app-menu>
-        <section *ngIf="startGame$ | async" class="players">
-            <app-player-card [player]="hostPlayer$ | async"></app-player-card>
-            <app-player-card [player]="guestPlayer$ | async"></app-player-card>
-        </section>
+        <app-menu 
+            [isStartGame]="startGame$ | async" 
+            [isLogin]="isLogin$ | async" 
+            [searchingElement]="searchingElementChanged$ | async"
+            [showInvite]="!(opponentPlayer$ | async)"
+            (startGame)="startGame()" 
+            (signIn)="onSingIn()" 
+            (invite)="onInvitePlayer()">
+
+            <app-profile loggedUser *ngIf="isLogin$ | async"  [user]="user$ | async" [showLogout]="true" (signOut)="onSignOut()"></app-profile>
+            
+            <app-profile opponentUser [user]="opponentPlayer$ | async"></app-profile>
+
+        </app-menu>
         <app-progress-bar *ngIf="startGame$ | async" (finish)="handleFinish($event)"
             [reset$]="searchingElementChanged$">
         </app-progress-bar>
-        <app-periodic-table [table]="table$ | async" [periodicTableRoom]="periodicTableRoom$ | async"
+        <app-periodic-table [table]="table$ | async"
             (selected)="handleSelected($event)"></app-periodic-table>
-    </mat-drawer-content>
-
-</mat-drawer-container>

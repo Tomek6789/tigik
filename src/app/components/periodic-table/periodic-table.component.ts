@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { Element } from "app/models/element";
-import { PeriodicTableRoom } from "app/services/rooms.service";
 
 @Component({
   selector: "app-periodic-table",
@@ -9,7 +8,6 @@ import { PeriodicTableRoom } from "app/services/rooms.service";
 })
 export class PeriodicTableComponent {
   @Input() table: Element[];
-  @Input() periodicTableRoom: PeriodicTableRoom;
 
   @Output() selected: EventEmitter<string> = new EventEmitter();
 

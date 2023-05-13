@@ -7,15 +7,24 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
 })
 export class MenuComponent {
   @Input() isStartGame: boolean;
+  @Input() searchingElement: string;
+  @Input() isLogin: boolean;
+  @Input() showInvite: boolean;
 
-  @Output() showRooms = new EventEmitter();
   @Output() startGame = new EventEmitter();
-
-  onShowRooms() {
-    this.showRooms.emit();
-  }
+  @Output() signIn = new EventEmitter();
+  @Output() invite = new EventEmitter();
 
   onStartGame() {
     this.startGame.emit();
   }
+
+  onSignIn() {
+    this.signIn.emit()
+  }
+  
+  onInvite() {
+    this.invite.emit()
+  }
+
 }

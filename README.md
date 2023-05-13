@@ -8,3 +8,6 @@ ng serve
 
 Warning !!!
 !!!! firebase emulators hosting is connected with production firebase !!!!
+
+****
+Room jest zawsze powiazany z userem

@@ -1,8 +1,29 @@
-<div *ngIf="!isStartGame" class="players">
-  <button (click)="onShowRooms()" mat-raised-button color="primary">
-    Show rooms
+<div class="menu">
+
+   <button *ngIf="!isLogin" mat-raised-button color="primary" (click)="onSignIn()"> 
+    <mat-icon>login</mat-icon>
+    Sign In
   </button>
-  <button mat-raised-button color="accent" (click)="onStartGame()">
+  <ng-content select=[loggedUser]></ng-content>
+
+  <button *ngIf="!isStartGame else: showElement"   mat-raised-button  color="accent" (click)="onStartGame()">
     Start Game
   </button>
+  
+  
+  <button *ngIf="showInvite else oponent" mat-raised-button color="primary" (click)="onInvite()"> 
+    <mat-icon>share</mat-icon>
+    Invite
+  </button>
+  
 </div>
+
+
+<ng-template #showElement>
+  <div class="find">{{ searchingElement }}</div>
+</ng-template>
+
+<ng-template #oponent>
+  <ng-content select=[opponentUser]></ng-content>
+
+</ng-template>
