@@ -7,20 +7,20 @@ import { Subscription } from "rxjs";
   templateUrl: "./user-profile.component.html",
   styleUrls: ["./user-profile.component.css"],
 })
-export class UserProfileComponent implements OnInit, OnDestroy {
+export class UserProfileComponent  {
   show: boolean
   user: any
   private sub: Subscription = new Subscription()
   constructor(public auth: AuthService) { }
 
-  ngOnInit() {
-    this.sub.add(this.auth.authStateChanged$.subscribe((user) => {
-      this.show = !!user
-      this.user = user
-    }))
-  }
+  // ngOnInit() {
+  //   this.sub.add(this.auth.authStateChanged$.subscribe((user) => {
+  //     this.show = !!user
+  //     this.user = user
+  //   }))
+  // }
 
-  ngOnDestroy() {
-    this.sub.unsubscribe();
-  }
+  // ngOnDestroy() {
+  //   this.sub.unsubscribe();
+  // }
 }

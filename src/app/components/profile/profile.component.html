@@ -15,8 +15,8 @@
         </span>
     </div>
 
-    <button *ngIf="showLogout" mat-icon-button >
-        <mat-icon color="primary"(click)="signOut.emit()">
+    <button *ngIf="showLogout" mat-icon-button (click)="onSignOut()" >
+        <mat-icon color="primary">
             logout
         </mat-icon>
         

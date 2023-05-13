@@ -14,6 +14,9 @@ export class ProfileComponent  {
     @Input() showLogout: boolean;
     @Output() signOut = new EventEmitter();
 
-
+    onSignOut() {
+        console.log('aaaaatest'),
+        this.signOut.emit()
+    }
 
 }

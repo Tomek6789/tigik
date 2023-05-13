@@ -1,83 +1,56 @@
 import { Injectable } from "@angular/core";
-import { AngularFireDatabase } from "@angular/fire/database";
+import { Database, list, ref, stateChanges, update } from "@angular/fire/database";
+import { equalTo, orderByKey, query } from "@firebase/database";
 import { AuthService } from "app/auth/auth.service";
 import { User } from "app/auth/user.model";
-import { BehaviorSubject, from, iif, merge, of } from "rxjs";
+import { BehaviorSubject, from, iif, merge, Observable, of, Subject } from "rxjs";
 import { filter, switchMap, tap, map, take, shareReplay } from "rxjs/operators";
 
 @Injectable({ providedIn: "root" })
 export class UserService {
-  constructor(public auth: AuthService, public database: AngularFireDatabase) { }
-
-  authChanged$ = this.auth.authStateChanged$;
-  users = this.database.list("users");
-
-  user: User;
-  isLogin: boolean
+  constructor(public auth: AuthService, public db: Database) { }
 
 
-  public user$ = this.authChanged$.pipe(
-    // filter<User>(Boolean),
-    tap((user) => {
-      this.user = user
-      this.isLogin = Boolean(user)
-    }),
-    switchMap((user) => {
-      console.log('switchmap user', user)
-      if(user) {
-        return from(this.createUser(user)).pipe(switchMap(() => this.onUserStateChanged(user.uid)))
-      } else {
-        return  of(user) // null
-      }
-    }),
-    tap((user) => {
-      this.user = user
-      this.isLogin = Boolean(user)
-    }),
-    filter<User>(Boolean),
-    shareReplay(1),
+  userUid = new Subject<string>()
+  userUid$ = this.userUid.asObservable()
 
-  );
+  public user$ = this.userUid$.pipe(
+    switchMap((userUid) =>this.onUserStateChanged(userUid)),
+    tap((us) => console.log('USER$', us)),
+    shareReplay(1)
+  )
 
-  onUserStateChanged(uid: string) {
-    return this.database
-      .list<User>("users", (ref) => ref.orderByKey().equalTo(uid))
-      .valueChanges()
-      .pipe(
-        map(([user]) => user),
-      )
+  onUserStateChanged(uid: string): Observable<User> {
+    const user = ref(this.db, 'users');
+    const queryRes = query(user, orderByKey(), equalTo(uid));
+
+    return stateChanges(queryRes)
+      .pipe(map(user => user.snapshot.val()))
   }
-
-  logoutUser$ = this.authChanged$.pipe(
-    filter((user) => user === null),
-    tap((userA) => {
-      this.isLogin = false
-      this.user = null
-    }),
-
-  );
-
 
   createUser(user: User) {
-    return this.users.update(user.uid, {
-      uid: user.uid,
-      displayName: user.displayName || 'Annonymous',
-      photoURL: user.photoURL,
-      score: 0,
-    })
+    return update(ref(this.db, 'users/' + user.uid), 
+      {
+        uid: user.uid,
+        displayName: user.displayName || 'Annonymous',
+        photoURL: user.photoURL,
+        score: 0,
+      });
   }
 
-  updateBestScore(score: number) {
-    this.users.update(this.user.uid, { bestScore: score });
+  updateBestScore(userUid: string, score: number) {
+    const user = ref(this.db, ('users/' + userUid))
+    update(user, { bestScore: score })
   }
 
-  updateScore(score: number) {
-    console.log(this.user.uid)
-    this.users.update(this.user.uid, { score });
+  updateScore(userUid: string, score: number) {
+    const user = ref(this.db, ('users/' + userUid))
+    update(user, { score })
   }
 
-  updateRoomAndRole(roomUid: string, role: "host" | "guest") {
-    this.users.update(this.user.uid, { roomUid, role });
+  updateRoomAndRole(userUid: string, roomUid: string, role: "host" | "guest") {
+    const user = ref(this.db, ('users/' + userUid))
+    return update(user, {  roomUid, role  })
   }
 
 }

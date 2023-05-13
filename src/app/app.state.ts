@@ -36,18 +36,14 @@ export class AppState {
     );
 
 
-    userRoom$ = this.userRoomUid$.pipe(
-        switchMap(roomUid => this.roomsService.onMyRoomStateChanged(roomUid)),
-        filter((room) => Boolean(room)),
-        shareReplay(1),
-    )
+    userRoom$ = this.roomsService.room$
     
 
     startGame$ = this.userRoom$.pipe(
         pluck("startGame")
     )
     periodicTableRoom$ = this.userRoom$.pipe(
-        map(({ startGame, searchingElement }) => ({ startGame, searchingElement })),
+        // map(({ startGame, searchingElement }) => ({ startGame, searchingElement })),
     );
     searchingElementChanged$ = this.userRoom$.pipe(pluck('searchingElement'));
 
@@ -72,35 +68,39 @@ export class AppState {
     }
 
 
-    createRoomUpdateUserRoomAndRole( ) {
-        this.user$.pipe(
-            take(1),
-            tap((user) => {
-            const room = this.roomsService.createRoom(user.uid)
-            const roomUid = room.key
-            this.userService.updateRoomAndRole(roomUid, 'host')
-            })
-        ).subscribe()
-    }
+    // createRoomUpdateUserRoomAndRole( ) {
+    //     this.user$.pipe(
+    //         take(1),
+    //         tap((user) => {
+    //         const room = this.roomsService.createRoom(user.uid)
+    //         const roomUid = room.key
+    //         this.userService.updateRoomAndRole(roomUid, 'host')
+    //         })
+    //     ).subscribe()
+    // }
 
-    createRoomUpdateUserRoomAndRoleAndStartGame( ) {
-        const room = this.roomsService.createRoom(this.userService.user.uid)
-        this.userService.updateRoomAndRole(room.key, 'host')
-        this.startGame()
-    }
+    // createRoomUpdateUserRoomAndRoleAndStartGame( ) {
+    //     const room = this.roomsService.createRoom(this.userService.user.uid)
+    //     this.userService.updateRoomAndRole(room.key, 'host')
+    //     this.startGame()
+    // }
 
     startGame() {
-        this.roomsService.startGame(this.userService.user.roomUid, true, this.randomElement(0));
+        this.userRoomUid$.pipe(
+            take(1),
+            tap((roomUid) => {
+                console.log(roomUid)
+                // this.roomsService.startGame(roomUid, true, this.randomElement(0));
+
+            })
+        ).subscribe()
 
     }
 
-    game(score: number) {
-        this.roomsService.searchingElement(this.userService.user.roomUid, this.randomElement(score));
-        this.userService.updateScore(score += 10);
+    // game(score: number) {
+    //     this.roomsService.searchingElement(this.randomElement(score));
+    //     this.userService.updateScore(score += 10);
 
-    }
+    // }
 
-    private randomElement(score: number): string {
-        return this.lotteryService.drawElement(score)
-      }
 }
