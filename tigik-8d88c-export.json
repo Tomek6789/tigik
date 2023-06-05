@@ -1,0 +1,55 @@
+{
+  "rooms": {
+    "-NTp5FlVqQ2G17rkOihL": {
+      "hostUid": "R9I5eYOsrVREV7lWTAAxfJOOCKD3",
+      "searchingElement": "Na",
+      "startGame": false
+    }
+  },
+  "users": {
+    "8Y6cVu326FUazZuxHVvsUAWEfUJ3": {
+      "displayName": "Julio César Melchor Pinto",
+      "score": 100,
+      "uid": "8Y6cVu326FUazZuxHVvsUAWEfUJ3"
+    },
+    "A1WpswsHeeSaLP6tmf1mPRwdVst1": {
+      "displayName": "Annonymous",
+      "uid": "A1WpswsHeeSaLP6tmf1mPRwdVst1"
+    },
+    "R9I5eYOsrVREV7lWTAAxfJOOCKD3": {
+      "displayName": "Annonymous",
+      "uid": "R9I5eYOsrVREV7lWTAAxfJOOCKD3"
+    },
+    "Uc5OBiuJzaQbp6Yxo4qJtKaiyZx2": {
+      "displayName": "Annonymous",
+      "score": 0,
+      "uid": "Uc5OBiuJzaQbp6Yxo4qJtKaiyZx2"
+    },
+    "hYlAuKR7rUaRJai3izpH0zbo0913": {
+      "displayName": "Annonymous",
+      "score": 0,
+      "uid": "hYlAuKR7rUaRJai3izpH0zbo0913"
+    },
+    "p2CUlspchSP2AL7V3fGufiohgF93": {
+      "displayName": "Annonymous",
+      "score": 0,
+      "uid": "p2CUlspchSP2AL7V3fGufiohgF93"
+    },
+    "r0A1xDs9xDdWbhtMh3IRV0V3hCA3": {
+      "displayName": "Annonymous",
+      "uid": "r0A1xDs9xDdWbhtMh3IRV0V3hCA3"
+    },
+    "vNYudyaAfBSBMw857XzgfBGWrTN2": {
+      "displayName": "Tomasz Grochocki",
+      "score": 0,
+      "uid": "vNYudyaAfBSBMw857XzgfBGWrTN2"
+    },
+    "yHvgNHjbtVToDz7pjLyOCoWAgMe2": {
+      "displayName": "Annonymous",
+      "role": "host",
+      "roomUid": "-Muomkj4pB45qbvDfuvH",
+      "score": 0,
+      "uid": "yHvgNHjbtVToDz7pjLyOCoWAgMe2"
+    }
+  }
+}

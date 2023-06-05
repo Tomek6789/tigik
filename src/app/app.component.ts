@@ -12,14 +12,17 @@ import { LotteryService } from "./services/lottery.service";
 import { RoomsService } from "./services/rooms.service";
 import { SnackBarService } from "./services/snackbar.service";
 import { UserService } from "./services/users.service";
-import { selectedElement, startGame } from "./store/room/room.actions";
-import { getLoginUser, signInUser } from "./store/user/user.actions";
+import { finishGame, getRoom, playerLeaveRoom, selectedElement, startGame } from "./store/room/room.actions";
+import { getLoginUser, userIsLogIn, signInUser, signOutUser,  inviteOpponent, removeOpponent } from "./store/user/user.actions";
 
-import { userFeatureKey, UserState} from './store/user/user.reducer'
-import { isUserLoginSelector } from "./store/user/user.selectors";
+import UserState, { usersFeatureKey} from './store/user/user.reducer'
+import { isAnonymousSelector, isUserLoginSelector, opponentSelector, roomUidSelector, showInviteSelector, userRoleSelector, userSelector } from "./store/user/user.selectors";
+import { searchingElementSelector, startGameSelector } from "./store/room/room.selectors";
+import { opponentUidSelector } from "./app.selectors";
+import { getOpponent } from "./store/user/user.actions";
 
 interface State {
-  [userFeatureKey]: UserState
+  [usersFeatureKey]: UserState
 }
 
 @Component({
@@ -28,78 +31,77 @@ interface State {
   styleUrls: ["./app.component.css"],
 })
 export class AppComponent implements OnInit {
-  userSelectedElementSubject = new Subject<string>()
-  // periodicTableRoom$ = this.appState.periodicTableRoom$
   table$ = this.appState.table$;
-  inviteRoomUid$ = this.activatedRoute.queryParams.pipe(map(a => a.room), filter<string>(Boolean))
+  inviteRoomUid$ = this.activatedRoute.queryParams.pipe(map(a => a.room))
   // user
   isLogin$ = this.store.select(isUserLoginSelector)
-  user$ = this.appState.user$
-  userUid$ = this.appState.userUid$;
-  userRoomUid$ = this.appState.userRoomUid$;
-  hasRoom$ = this.appState.hasRoom$
-  role$ = this.appState.role$;
-  score$ = this.appState.score$;
-  isBestScore$ = this.appState.isBestScore$;
-
+  isAnonymous$ = this.store.select(isAnonymousSelector)
+  user$ = this.store.select(userSelector)
 
   // room
-  startGame$ = this.appState.startGame$
-  searchingElementChanged$ = this.appState.searchingElementChanged$;
-  opponentPlayer$ = this.appState.opponentPlayer$;
+  startGame$ = this.store.select(startGameSelector)
+  searchingElementChanged$ = this.store.select(searchingElementSelector);
+  opponentPlayer$ = this.store.select(opponentSelector);
+  showInvite$ = this.store.select(showInviteSelector);
+  roomUid$ = this.store.select(roomUidSelector);
 
+
+  @HostListener('window:beforeunload')
+  beforeUnloadHandler() {
+      this.store.dispatch(playerLeaveRoom())
+  }
 
   constructor(
     private appState: AppState,
     private activatedRoute: ActivatedRoute,
     public userService: UserService,
-    private roomsService: RoomsService,
     private snackBarService: SnackBarService,
     private router: Router,
     private serializer: UrlSerializer,
     private clipboard: Clipboard,
-    private auth: AuthService,
 
     private store: Store<State>
-  ) { 
-    console.log('constr app')
-  }
+  ) {   }
 
   ngOnInit() {
 
-    this.store.dispatch(getLoginUser())
 
-    combineLatest([this.inviteRoomUid$, this.userUid$]).subscribe(([roomUid, uid]) => {
-      // this.userService.updateRoomAndRole(roomUid, 'guest')
-      // this.roomsService.joinRoom(roomUid, uid)
+    this.inviteRoomUid$.pipe(take(1)).subscribe((roomUid) => {
+      this.store.dispatch(getLoginUser({ roomUid }))
+
+      // this.store.dispatch(inviteOpponent({ roomUid }))
     });
 
-    //game
-    this.userSelectedElementSubject.asObservable().pipe(
-      withLatestFrom(combineLatest([
-        this.searchingElementChanged$,
-        this.score$.pipe(startWith(null)),
-      ])),
-      filter(([userSelectedElement, [roomElement]]) => userSelectedElement === roomElement),
-      tap(([userSelectedElement, [a, score]]) => {
-        // this.appState.game(score)
-      })
-    ).subscribe()
+    // combineLatest(this.roomUid$.pipe(filter<string>(Boolean)), this.inviteRoomUid$).pipe(
+    //   // filter(([roomUid, role]) => role === '')
+    // ).subscribe(([roomUid, routeRoomUid]) => {
+    //   console.log(roomUid)
+    //         if(routeRoomUid !== roomUid) {
+              
+    //   console.log('GET NEW ROOM UID') 
+    //   this.store.dispatch(removeOpponent()) // from old room
+    //   this.store.dispatch(getOpponent())
+    //   this.store.dispatch(getRoom())
+
+    //           console.log('GUEST BECOME HOST')
+    //           this.router.navigate(
+    //             [], 
+    //             {
+    //               // relativeTo: this.activatedRoute,
+    //               queryParams: { room: null },
+    //               // queryParamsHandling: 'merge'
+    //             }
+    //             )
+    //           }
+    // })
   }
 
   handleFinish() {
-
-    //   this.roomsService.startGame(this.userService.user.roomUid, false, null);
-    //   this.userService.updateScore(0);
-
-    // this.isBestScore$.pipe(take(1)).subscribe(bestScore => {
-    //   // this.userService.updateBestScore(bestScore)
-    // })
+    this.store.dispatch(finishGame())
   }
 
   handleSelected(symbol: string) {
     this.store.dispatch(selectedElement({selectedElement: symbol}))
-    // this.userSelectedElementSubject.next(symbol)
   }
 
  onSingIn() {
@@ -107,53 +109,32 @@ export class AppComponent implements OnInit {
   }
 
   onSignOut() {
-    this.auth.signOut()
+    this.store.dispatch(signOutUser())
   }
 
-
-
-
-
-  async startGame() {
+  startGame() {
     this.store.dispatch(startGame())
-
-//     if(this.userService.isLogin) {
-
-//       console.log('Start game for login user')
-//       this.appState.startGame()
-//       } else {
-// console.log('Start game for annoynomous user')
-
-//         // loginAnnonumous = action
-//         // auth.effect - annonymus -> set user -> triger create room
-//         // room.effect -
-
-//        await this.auth.annonymus()
-       
-//       //  .then((user) => {
-//       //   // console.log(user)
-//       //   console.log('then', user)
-//       //    this.appState.createRoomUpdateUserRoomAndRoleAndStartGame()
-//       //  })
-
-      
-//     }
-
- 
-      
-
   }
 
 
+  test() {
+    // this.store.dispatch(userLeaveRoom())
+
+  }
 
   onInvitePlayer() {
     
-        // const tree = this.router.createUrlTree([], { queryParams: { room: this.userService.user.roomUid } });
-      const tree= {} as any
-
+    this.store.select(roomUidSelector).pipe(
+      tap((roomUid) => {
+        const tree = this.router.createUrlTree([], { queryParams: { room: roomUid } });
+        
+        
         this.clipboard.copy(`http://localhost:4200${this.serializer.serialize(tree)}`);
         this.snackBarService.openSnackBar("Send this link to your friend");
         
+        
+              })
+            ).subscribe()
   }
 }
 

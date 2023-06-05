@@ -36,27 +36,28 @@ export class AppState {
     );
 
 
-    userRoom$ = this.roomsService.room$
+    // userRoom$ = this.roomsService.room$
     
 
-    startGame$ = this.userRoom$.pipe(
-        pluck("startGame")
-    )
-    periodicTableRoom$ = this.userRoom$.pipe(
-        // map(({ startGame, searchingElement }) => ({ startGame, searchingElement })),
-    );
-    searchingElementChanged$ = this.userRoom$.pipe(pluck('searchingElement'));
+    // startGame$ = this.userRoom$.pipe(
+    //     tap((room) => console.log(room)),
+    //     pluck("startGame")
+    // )
+    // periodicTableRoom$ = this.userRoom$.pipe(
+    //     // map(({ startGame, searchingElement }) => ({ startGame, searchingElement })),
+    // );
+    // searchingElementChanged$ = this.userRoom$.pipe(pluck('searchingElement'));
 
 
-    opponentPlayer$ = combineLatest([this.role$, this.userRoom$]).pipe(
-        map(([logginUserRole, room]) => {
-            const key = logginUserRole === "host" ? "guestUid" : "hostUid";
-            console.log('Oponent:',key)
-            return room[key]
-        }),
-        filter<string>(Boolean), //when guest is not in room
-        switchMap((playerUid) => this.userService.onUserStateChanged(playerUid)),
-    ) 
+    // opponentPlayer$ = combineLatest([this.role$, this.userRoom$]).pipe(
+    //     map(([logginUserRole, room]) => {
+    //         const key = logginUserRole === "host" ? "guestUid" : "hostUid";
+    //         console.log('Oponent:',key)
+    //         return room[key]
+    //     }),
+    //     filter<string>(Boolean), //when guest is not in room
+    //     switchMap((playerUid) => this.userService.onUserStateChanged(playerUid)),
+    // ) 
     
 
     constructor(

@@ -1,9 +1,14 @@
-import { createReducer } from "@ngrx/store";
+import { createReducer, on } from "@ngrx/store";
+import { getRoomSuccess, removeRoom } from "./room.actions";
 
 export const roomFeatureKey = 'room';
 
 export interface RoomState {
-  
+  key?: string;
+  guestUid?: string;
+  hostUid?: string;
+  startGame?: boolean;
+  searchingElement?: string;
 }
 
 export const initialState: RoomState = {
@@ -11,6 +16,8 @@ export const initialState: RoomState = {
 
 export const reducerRoom = createReducer(
   initialState,
-//   on(signInUserSuccess, (state, action) => ({ ...state, userUid: action.userUid })),
-//   on(isUserLogIn, (state, action) => ({ ...state, isLogin: action.isLogin }))
+
+  on(getRoomSuccess, (state, action) => ({ ...action.room })),
+
+  // on(removeRoom, () => initialState)
 );

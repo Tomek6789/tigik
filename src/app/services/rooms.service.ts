@@ -3,7 +3,7 @@ import { Database, ref, list, update, stateChanges, equalTo } from "@angular/fir
 import { child, onValue, orderByKey, push, query, remove } from "@firebase/database";
 import { AuthService } from "app/auth/auth.service";
 import { User } from "app/auth/user.model";
-import { Subject } from "rxjs";
+import { Subject, Observable } from "rxjs";
 import { filter, map, shareReplay, switchMap, tap } from "rxjs/operators";
 import { UserService } from "./users.service";
 
@@ -25,20 +25,15 @@ export class RoomsService {
     public db: Database
       ) { }
 
-
-
   roomUid = new Subject<string>()
   roomUid$ = this.roomUid.asObservable()
 
-  room$ = this.roomUid$.pipe(
-    switchMap((roomUid) =>this.onMyRoomStateChanged(roomUid)),
-    shareReplay(1)
-  )
-
-  onMyRoomStateChanged(roomUid: string) {
-    const room = ref(this.db, 'room');
+  onMyRoomStateChanged(roomUid: string): Observable<Room> {
+    console.log(roomUid)
+    const room = ref(this.db, 'rooms');
     const queryRes = query(room, orderByKey(), equalTo(roomUid));
 
+    console.log('get room')
     return stateChanges(queryRes)
       .pipe(map(user => user.snapshot.val()))
   }
@@ -71,6 +66,7 @@ export class RoomsService {
   async startGame(roomUid: string, status: boolean, element: string) {
     const room = ref(this.db, ('rooms/' + roomUid))
     console.log(roomUid)
+    this.roomUid.next(roomUid)
     return await update(room, {
       startGame: status,
       searchingElement: element,

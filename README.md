@@ -11,3 +11,7 @@ Warning !!!
 
 ****
 Room jest zawsze powiazany z userem
+
+*** MIND MAP:
+
+https://www.mindmeister.com/map/2731536696

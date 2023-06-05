@@ -1,11 +1,13 @@
 export type Role = "host" | "guest";
 
 export interface User {
-  uid: string;
+  isAnonymous: boolean;
+  isLogin: boolean;
+  userUid: string;
   score?: number;
   bestScore?: number;
   roomUid?: string;
   role?: Role;
-  photoURL?: string;
   displayName?: string;
+  photoURL?: string;
 }
