@@ -5,11 +5,6 @@ import { Store } from "@ngrx/store";
 import { combineLatest, Subject, from, iif } from "rxjs";
 import { filter, map, pluck, startWith, switchMap, take, tap, withLatestFrom } from "rxjs/operators";
 import { AppState } from "./app.state";
-import { AuthService } from "./auth/auth.service";
-import { User } from "./auth/user.model";
-import { DialogService } from "./dialogs/dialog.service";
-import { LotteryService } from "./services/lottery.service";
-import { RoomsService } from "./services/rooms.service";
 import { SnackBarService } from "./services/snackbar.service";
 import { UserService } from "./services/users.service";
 import { finishGame, getRoom, playerLeaveRoom, selectedElement, startGame } from "./store/room/room.actions";
@@ -18,8 +13,6 @@ import { getLoginUser, userIsLogIn, signInUser, signOutUser,  inviteOpponent, re
 import UserState, { usersFeatureKey} from './store/user/user.reducer'
 import { isAnonymousSelector, isUserLoginSelector, opponentSelector, roomUidSelector, showInviteSelector, userRoleSelector, userSelector } from "./store/user/user.selectors";
 import { searchingElementSelector, startGameSelector } from "./store/room/room.selectors";
-import { opponentUidSelector } from "./app.selectors";
-import { getOpponent } from "./store/user/user.actions";
 
 interface State {
   [usersFeatureKey]: UserState
@@ -32,7 +25,6 @@ interface State {
 })
 export class AppComponent implements OnInit {
   table$ = this.appState.table$;
-  inviteRoomUid$ = this.activatedRoute.queryParams.pipe(map(a => a.room))
   // user
   isLogin$ = this.store.select(isUserLoginSelector)
   isAnonymous$ = this.store.select(isAnonymousSelector)
@@ -53,7 +45,6 @@ export class AppComponent implements OnInit {
 
   constructor(
     private appState: AppState,
-    private activatedRoute: ActivatedRoute,
     public userService: UserService,
     private snackBarService: SnackBarService,
     private router: Router,
@@ -65,12 +56,22 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
 
+    const roomUid = window.location.href.split('=')[1];
+    console.log(roomUid)
+    if(roomUid) {
+      console.log('GUEST')
+    } else {
+      console.log('HOST')
+            this.store.dispatch(getLoginUser({ roomUid: undefined }))
 
-    this.inviteRoomUid$.pipe(take(1)).subscribe((roomUid) => {
-      this.store.dispatch(getLoginUser({ roomUid }))
+    }
+
+    // this.inviteRoomUid$.subscribe((roomUid) => {
+      // console.log('app component', roomUid )
+      // this.store.dispatch(getLoginUser({ roomUid }))
 
       // this.store.dispatch(inviteOpponent({ roomUid }))
-    });
+    // });
 
     // combineLatest(this.roomUid$.pipe(filter<string>(Boolean)), this.inviteRoomUid$).pipe(
     //   // filter(([roomUid, role]) => role === '')

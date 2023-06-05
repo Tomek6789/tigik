@@ -1,6 +1,6 @@
 import { Actions, concatLatestFrom, createEffect, ofType } from "@ngrx/effects";
 import { AuthService } from "app/auth/auth.service";
-import { getLoginUser, userIsLogIn, getUser, userStateChangedSuccess, signInUser, userIsLogOut, signOutUser, getOpponent, opponentStateChangedSuccess, inviteOpponent, signInAsAnonymous, signInAsAnonymousSuccess } from './user.actions'
+import { getLoginUser, userIsLogIn, getUser, userStateChangedSuccess, signInUser, userIsLogOut, signOutUser, getOpponent, opponentStateChangedSuccess, inviteOpponent, signInAsAnonymous, startGameForAnonymous, signForGuest, changeUserRole } from './user.actions'
 import { filter, map, mergeMap, switchMap ,  tap } from 'rxjs/operators'
 import { from, pipe } from "rxjs";
 import { Injectable } from "@angular/core";
@@ -13,6 +13,7 @@ import { roomUidSelector, userUidSelector } from "./user.selectors";
 import { waitForActions, waitForProp2 } from "app/wait-for-actions";
 import { opponentUidSelector } from "app/app.selectors";
 import { AppState } from "app/app.module";
+import { Role } from "app/auth/user.model";
 
 
 @Injectable({ providedIn: 'root'})
@@ -35,14 +36,20 @@ export class UserEffects {
             }
 
             //guest user
-            if( roomUid) {
-                actions.push(getRoom())
+            if(roomUid) {
+                actions.push(getRoom(), changeUserRole())
             } 
-            
+
+            //guest user - create user
+            if(userUid === null) {
+                actions.push(signForGuest({ roomUid }))
+            }
+
             //host user
             if(userUid && roomUid === undefined) {
                 actions.push(createRoom())
             }
+
 
             return actions;
         })
@@ -87,11 +94,22 @@ export class UserEffects {
     signInAsAnonymous$ = createEffect(() => this.actions$.pipe(
         ofType(signInAsAnonymous),
         switchMap(() => {
-            return this.auth.anonymous()
+            return from(this.auth.anonymous())
         }),
         this.createUser(),
         map(() => {
-            return signInAsAnonymousSuccess()
+            return startGameForAnonymous()
+        })
+    ))
+
+    signInForGuest$ = createEffect(() => this.actions$.pipe(
+        ofType(signForGuest),
+        switchMap(({ roomUid }) => {
+            return from(this.auth.anonymous()).pipe(map((user) => ({ ...user, roomUid })))
+        }),
+        this.createUser('guest'),
+        map(() => {
+            return startGameForAnonymous()
         })
     ))
 
@@ -127,6 +145,16 @@ export class UserEffects {
         })
     ), { dispatch: false })
 
+
+    changeUserRole = createEffect(() => this.actions$.pipe(
+        ofType(changeUserRole),
+        concatLatestFrom(() => [
+            this.store.select(userUidSelector)
+        ]),
+        tap(([action, userUid]) => {
+            this.userService.updateRole(userUid, 'guest')
+        })
+    ), { dispatch: false })
 
     // inviteOpponent$ = createEffect(() => this.actions$.pipe(
     //     ofType(inviteOpponent),
@@ -166,12 +194,12 @@ export class UserEffects {
         private roomService: RoomsService
       ) {}
 
-    private createUser() {
+    private createUser(roomUid: string = '', role: Role = 'host') {
         return pipe(
             // filter((user: UserCredential) => {
             //     return user.user.metadata.creationTime === user.user.metadata.lastSignInTime 
             // }),
-            switchMap(({ user: { displayName, photoURL , uid, isAnonymous }}: UserCredential) => {
+            switchMap(({ roomUid, user: { displayName, photoURL , uid, isAnonymous }}: UserCredential & { roomUid: string }) => {
                 console.log(isAnonymous)
                 return from(
                     //createUser in my user database,
@@ -182,7 +210,8 @@ export class UserEffects {
                         photoURL,
                         userUid: uid,
                         score: 0,
-                        role: 'host'
+                        role,
+                        roomUid,
                     })
                 ).pipe(
                     map(() => uid)

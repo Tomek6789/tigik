@@ -10,15 +10,14 @@ import { from, of } from "rxjs";
 import { createRoom, finishGame, getRoom, getRoomSuccess, playerLeaveRoom, selectedElement, startGame, startGameSuccess } from "./room.actions";
 import { bestScoreSelector, isUserLoginSelector, roomUidSelector, scoreSelector, userRoleSelector, userUidSelector } from "../user/user.selectors";
 import { waitForActions, waitForProp } from "app/wait-for-actions";
-import { signInAsAnonymous, signInAsAnonymousSuccess, userStateChangedSuccess } from "../user/user.actions";
-import { guestUidSelector } from "./room.selectors";
+import { signInAsAnonymous, startGameForAnonymous, userStateChangedSuccess } from "../user/user.actions";
+import { guestUidSelector, searchingElementSelector } from "./room.selectors";
 
 @Injectable({ providedIn: 'root'})
 export class RoomEffects {
 
     getRoom$ = createEffect(() => this.actions$.pipe(
         ofType(getRoom),
-        // waitForActions([userStateChangedSuccess(null)], this.actions$),
         waitForProp('roomUid', this.store),
         concatLatestFrom(() => [
             this.store.select(roomUidSelector),
@@ -48,7 +47,7 @@ export class RoomEffects {
     ))
 
     startGameForAnonymous$ = createEffect(() => this.actions$.pipe(
-        ofType(signInAsAnonymousSuccess),
+        ofType(startGameForAnonymous),
         waitForActions([getRoomSuccess(null)], this.actions$),
         concatLatestFrom(() => [
             this.store.select(roomUidSelector),
@@ -65,10 +64,13 @@ export class RoomEffects {
             this.store.select(userUidSelector),
             this.store.select(roomUidSelector),
             this.store.select(scoreSelector),
+            this.store.select(searchingElementSelector),
         ]),
-        tap(([action, userUid, roomUid , score ]) => {
-            this.roomService.searchingElement(roomUid, this.randomElement(score))
-            this.userService.updateScore(userUid, score + 10 )
+        tap(([action, userUid, roomUid , score, searchingElement ]) => {
+            if(searchingElement === action.selectedElement) {
+                this.roomService.searchingElement(roomUid, this.randomElement(score))
+                this.userService.updateScore(userUid, score + 10 )
+            }
         })
     ), { dispatch: false })
 
@@ -99,11 +101,11 @@ export class RoomEffects {
             this.store.select(roomUidSelector),
         ]),
         tap(([action, userUid, userRole, roomUid ]) => {
+            const role = userRole === 'host' ? 'hostUid' : 'guestUid';
+            this.roomService.removeUserFromRoom(roomUid, role)
             this.userService.updateRoom(userUid, null);
             this.userService.updateRole(userUid, null);
             this.userService.updateIsLogin(userUid, false);
-            const role = userRole === 'host' ? 'hostUid' : 'guestUid';
-            this.roomService.removeUserFromRoom(roomUid, null)
         })
     ), { dispatch: false })
 
