@@ -11,7 +11,7 @@ import { User } from 'app/auth/user.model';
 export class ProfileComponent  {
 
     @Input() user: User;
-    @Input() showLogout: boolean;
+    @Input() showLogout: boolean = true
     @Output() signOut = new EventEmitter();
 
     onSignOut() {

@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Database, list, ref, stateChanges, update } from "@angular/fire/database";
 import { equalTo, orderByKey, query } from "@firebase/database";
 import { AuthService } from "app/auth/auth.service";
-import { User } from "app/auth/user.model";
+import { Role, User } from "app/auth/user.model";
 import { BehaviorSubject, from, iif, merge, Observable, of, Subject } from "rxjs";
 import { filter, switchMap, tap, map, take, shareReplay } from "rxjs/operators";
 
@@ -29,12 +29,15 @@ export class UserService {
   }
 
   createUser(user: User) {
-    return update(ref(this.db, 'users/' + user.uid), 
+    return update(ref(this.db, 'users/' + user.userUid), 
       {
-        uid: user.uid,
+        isAnonymous: user.isAnonymous,
+        userUid: user.userUid,
         displayName: user.displayName || 'Annonymous',
-        photoURL: user.photoURL,
+        photoURL: user.photoURL || 'missing',
         score: 0,
+        role: user.role,
+        roomUid: user.roomUid || null,
       });
   }
 
@@ -48,9 +51,19 @@ export class UserService {
     update(user, { score })
   }
 
-  updateRoomAndRole(userUid: string, roomUid: string, role: "host" | "guest") {
+  updateRoom(userUid: string, roomUid: string) {
     const user = ref(this.db, ('users/' + userUid))
-    return update(user, {  roomUid, role  })
+    return update(user, {  roomUid  })
+  }
+
+  updateIsLogin(userUid: string, isLogin: boolean) {
+    const user = ref(this.db, ('users/' + userUid));
+    return update(user, { isLogin })
+  }
+
+  updateRole(userUid: string, role: Role) {
+    const user = ref(this.db, ('users/' + userUid));
+    return update(user, { role })
   }
 
 }

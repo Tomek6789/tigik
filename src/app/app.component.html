@@ -4,13 +4,13 @@
             [isStartGame]="startGame$ | async" 
             [isLogin]="isLogin$ | async" 
             [searchingElement]="searchingElementChanged$ | async"
-            [showInvite]="!(opponentPlayer$ | async)"
+            [showInvite]="showInvite$ | async"
             (startGame)="startGame()" 
             (signIn)="onSingIn()" 
             (invite)="onInvitePlayer()">
 
-            <app-profile loggedUser *ngIf="isLogin$ | async"  [user]="user$ | async" [showLogout]="true" (signOut)="onSignOut()"></app-profile>
-            
+            <app-profile loggedUser *ngIf="isLogin$ | async"  [user]="user$ | async"  (signOut)="onSignOut()"></app-profile>
+            <!-- [showLogout]="!(isAnonymous$ | async)" -->
             <app-profile opponentUser [user]="opponentPlayer$ | async"></app-profile>
 
         </app-menu>
@@ -19,3 +19,5 @@
         </app-progress-bar>
         <app-periodic-table [table]="table$ | async"
             (selected)="handleSelected($event)"></app-periodic-table>
+
+            <button (click)="test()">TEST</button>

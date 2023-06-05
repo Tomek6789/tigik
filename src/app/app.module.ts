@@ -39,10 +39,10 @@ import { environment } from '../environments/environment';
 import { ProfileComponent } from "./components/profile/profile.component";
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
-import { reducerUser, userFeatureKey, UserState } from "./store/user/user.reducer";
+import UserState, { reducerUser, usersFeatureKey } from "./store/user/user.reducer";
 import { reducerRoom, roomFeatureKey, RoomState } from "./store/room/room.reducer";
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { provideDatabase } from "@angular/fire/database";
+import { connectDatabaseEmulator, provideDatabase } from "@angular/fire/database";
 import { getDatabase } from "@firebase/database";
 import { provideAuth } from "@angular/fire/auth";
 import { getAuth } from "@firebase/auth";
@@ -50,7 +50,7 @@ import { UserEffects } from "./store/user/user.effects";
 import { RoomEffects } from "./store/room/room.effects";
 
 export interface AppState {
-  [userFeatureKey]: UserState,
+  [usersFeatureKey]: UserState,
   [roomFeatureKey]: RoomState
 }
 
@@ -62,7 +62,11 @@ export interface AppState {
     // AngularFireDatabaseModule,
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideFirestore(() => getFirestore()),
-    provideDatabase(() => getDatabase()),
+    provideDatabase(() => {
+      const database = getDatabase();
+      connectDatabaseEmulator(database, 'localhost', 9000)
+      return database
+    }),
     provideAuth(() => getAuth()),
 
     BrowserModule,
@@ -91,7 +95,7 @@ export interface AppState {
     ClipboardModule,
     AuthModule,
     StoreModule.forRoot({
-      [userFeatureKey]: reducerUser,
+      [usersFeatureKey]: reducerUser,
       [roomFeatureKey]: reducerRoom
     }, {}),
     EffectsModule.forRoot([UserEffects, RoomEffects]),

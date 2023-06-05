@@ -1,5 +1,5 @@
 import { inject, Injectable } from "@angular/core";
-import { Auth, signInWithPopup,  signInAnonymously, GoogleAuthProvider, signOut } from "@angular/fire/auth";
+import { Auth, signInWithPopup,  signInAnonymously, GoogleAuthProvider, signOut, signInWithCustomToken,  } from "@angular/fire/auth";
 import { Observable, Subject } from "rxjs";
 import { User } from "./user.model";
 
@@ -8,29 +8,22 @@ import { User } from "./user.model";
 })
 export class AuthService {
 
-  authStateChangedSubject = new Subject<User>()
-  aauthStateChanged$: Observable<User> = this.authStateChangedSubject.asObservable();
+  authStateChangedSubject = new Subject<string>()
+  authStateChanged$: Observable<string> = this.authStateChangedSubject.asObservable();
 
   private auth: Auth = inject(Auth);
 
   constructor() {
-   
     this.auth.onAuthStateChanged(user => {
-      console.log('INIT',user)
-      this.authStateChangedSubject.next(user)
+      console.log(user)
+      this.authStateChangedSubject.next(user?.uid)
     })
-
   }
 
-  getCurrentuser() {
-    return this.auth.currentUser
-  }
-
-  async googleSignin() {
+  async googleSignIn() {
     const provider = new GoogleAuthProvider();
-    
+
     try {
-      console.log('auth service - sgininwith pop')
       return await signInWithPopup(this.auth, provider);
       
     } catch (error) {
@@ -40,11 +33,10 @@ export class AuthService {
 
 
   async signOut() {
-    console.log('sigout')
     return await signOut(this.auth);
   }
 
-  async annonymus() {
+  async anonymous() {
     return await signInAnonymously(this.auth);
   }
 }

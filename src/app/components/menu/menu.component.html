@@ -11,7 +11,7 @@
   </button>
   
   
-  <button *ngIf="showInvite else oponent" mat-raised-button color="primary" (click)="onInvite()"> 
+  <button *ngIf="showInvite else opponent" mat-raised-button color="primary" (click)="onInvite()"> 
     <mat-icon>share</mat-icon>
     Invite
   </button>
@@ -23,7 +23,7 @@
   <div class="find">{{ searchingElement }}</div>
 </ng-template>
 
-<ng-template #oponent>
+<ng-template #opponent>
   <ng-content select=[opponentUser]></ng-content>
 
 </ng-template>
