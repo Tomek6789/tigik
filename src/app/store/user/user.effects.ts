@@ -1,13 +1,13 @@
 import { Actions, concatLatestFrom, createEffect, ofType } from "@ngrx/effects";
 import { AuthService } from "app/auth/auth.service";
-import { getLoginUser, userIsLogIn, getUser, userStateChangedSuccess, signInUser, userIsLogOut, signOutUser, getOpponent, opponentStateChangedSuccess, inviteOpponent, signInAsAnonymous, startGameForAnonymous, signForGuest, changeUserRole } from './user.actions'
+import { getLoginHostUser, userIsLogIn, getUser, userStateChangedSuccess, signInUser, userIsLogOut, signOutUser, getOpponent, opponentStateChangedSuccess, inviteOpponent, signInAsAnonymous, startGameForAnonymous, signForGuest, changeUserRole, getLoginGuestUser } from './user.actions'
 import { filter, map, mergeMap, switchMap ,  tap } from 'rxjs/operators'
 import { from, pipe } from "rxjs";
 import { Injectable } from "@angular/core";
 import { UserService } from "app/services/users.service";
 import { UserCredential} from '@firebase/auth'
 import { RoomsService } from "app/services/rooms.service";
-import { createRoom, getRoom, getRoomSuccess, removeRoom } from "../room/room.actions";
+import { createRoom, getRoom, getRoomSuccess, joinRoom } from "../room/room.actions";
 import { Action, Store } from "@ngrx/store";
 import { roomUidSelector, userUidSelector } from "./user.selectors";
 import { waitForActions, waitForProp2 } from "app/wait-for-actions";
@@ -19,38 +19,40 @@ import { Role } from "app/auth/user.model";
 @Injectable({ providedIn: 'root'})
 export class UserEffects {
 
-    getLoginUserOnInit$ = createEffect(() => this.actions$.pipe(
-        ofType(getLoginUser), 
-        switchMap(({ roomUid }) => {
-            return  this.auth.authStateChanged$.pipe(map((userUid) => ({ roomUid, userUid })))
+    getLoginHostUser$ = createEffect(() => this.actions$.pipe(
+        ofType(getLoginHostUser), 
+        switchMap(() => {
+            return  this.auth.authStateChanged$;
         }),
-        mergeMap(({userUid, roomUid}) => {
-            console.log(userUid, roomUid )
+        mergeMap((userUid) => {
+            console.log('HOST',userUid )
             const actions: Action[] = []
             if(userUid) {
                 //login user
-                actions.push(userIsLogIn({userUid}), getOpponent(), getUser({ userUid }))
+                actions.push(userIsLogIn({userUid}), getOpponent(), getUser({ userUid }), createRoom())
             } else {
                 //logout user or no user(first time in app)
                 actions.push(userIsLogOut())
             }
+            return actions;
+        })
+    ))
 
-            //guest user
-            if(roomUid) {
-                actions.push(getRoom(), changeUserRole())
-            } 
-
-            //guest user - create user
-            if(userUid === null) {
-                actions.push(signForGuest({ roomUid }))
+    getLoginGuestUser$ = createEffect(() => this.actions$.pipe(
+        ofType(getLoginGuestUser), 
+        switchMap(({ roomUid }) => {
+            return  this.auth.authStateChanged$.pipe(map((userUid) => ({ roomUid, userUid })))
+        }),
+        mergeMap(({userUid, roomUid}) => {
+            console.log('GUEST',userUid, roomUid )
+            const actions: Action[] = []
+            if(userUid) {
+                //login user
+                actions.push(joinRoom({roomUid}), changeUserRole({ roomUid }), userIsLogIn({userUid}), getOpponent(), getUser({ userUid }), getRoom() )
+            } else {
+                //logout user or no user(first time in app)
+                actions.push(userIsLogOut())
             }
-
-            //host user
-            if(userUid && roomUid === undefined) {
-                actions.push(createRoom())
-            }
-
-
             return actions;
         })
     ))
@@ -104,14 +106,16 @@ export class UserEffects {
 
     signInForGuest$ = createEffect(() => this.actions$.pipe(
         ofType(signForGuest),
+        waitForActions([userIsLogOut], this.actions$),
+        filter(() => {
+            console.log('SIGN FOR GUEST ---- userCreated', this.auth.userCreated)
+            return !this.auth.userCreated
+        }),
         switchMap(({ roomUid }) => {
             return from(this.auth.anonymous()).pipe(map((user) => ({ ...user, roomUid })))
         }),
-        this.createUser('guest'),
-        map(() => {
-            return startGameForAnonymous()
-        })
-    ))
+        this.createUserGuest(),
+    ), { dispatch: false })
 
     signOut$ = createEffect(() => 
         this.actions$.pipe(
@@ -148,43 +152,16 @@ export class UserEffects {
 
     changeUserRole = createEffect(() => this.actions$.pipe(
         ofType(changeUserRole),
+        waitForActions([userStateChangedSuccess(null)], this.actions$),
         concatLatestFrom(() => [
             this.store.select(userUidSelector)
         ]),
-        tap(([action, userUid]) => {
+        tap(([{ roomUid }, userUid]) => {
+            console.log('user', userUid, roomUid)
             this.userService.updateRole(userUid, 'guest')
+            this.userService.updateRoom(userUid, roomUid)
         })
     ), { dispatch: false })
-
-    // inviteOpponent$ = createEffect(() => this.actions$.pipe(
-    //     ofType(inviteOpponent),
-    //     // waitForActions([])
-    //     switchMap(({ roomUid }) => {
-    //         //login guest as anonymous
-    //         //cause onAuthStateChanged trigged
-    //         return from(this.auth.anonymous()).pipe(map((user) => ({  roomUid, displayName: user.user.displayName, guestUid: user.user.uid, isAnonymous: user.user.isAnonymous })))
-    //     }),
-    //     switchMap(({ roomUid,  displayName,  guestUid, isAnonymous }) => {
-    //         return from(
-    //             //createUser in my user database,
-    //             this.userService.createUser({
-    //                 isAnonymous,
-    //                 isLogin: true,
-    //                 displayName,
-    //                 userUid: guestUid,
-    //                 score: 0,
-    //                 role: 'guest',
-    //                 roomUid,
-    //             })
-    //         ).pipe(
-    //             map(() => ({guestUid, roomUid}))
-    //         )
-    //     }),
-    //     tap(({roomUid, guestUid}) => {
-    //         this.roomService.joinRoom(roomUid, guestUid)
-    //     }),
-    // ), { dispatch: false })
-
 
     constructor(
         private actions$: Actions,
@@ -194,12 +171,12 @@ export class UserEffects {
         private roomService: RoomsService
       ) {}
 
-    private createUser(roomUid: string = '', role: Role = 'host') {
+    private createUser(role: Role = 'host') {
         return pipe(
             // filter((user: UserCredential) => {
             //     return user.user.metadata.creationTime === user.user.metadata.lastSignInTime 
             // }),
-            switchMap(({ roomUid, user: { displayName, photoURL , uid, isAnonymous }}: UserCredential & { roomUid: string }) => {
+            switchMap(({ user: { displayName, photoURL , uid, isAnonymous }}: UserCredential) => {
                 console.log(isAnonymous)
                 return from(
                     //createUser in my user database,
@@ -210,25 +187,41 @@ export class UserEffects {
                         photoURL,
                         userUid: uid,
                         score: 0,
-                        role,
+                        role: 'host',
+                    })
+                ).pipe(
+                    map(() => uid)
+                )
+            }),
+        ) 
+    }
+
+    private createUserGuest() {
+        return pipe(
+            // filter((user: UserCredential) => {
+            //     return user.user.metadata.creationTime === user.user.metadata.lastSignInTime 
+            // }),
+            switchMap(({ roomUid, user: { displayName, photoURL , uid, isAnonymous }}: UserCredential & { roomUid: string }) => {
+                console.log(isAnonymous)
+                console.log('ROOMUID - CREATE USER - GUEST', roomUid)
+                return from(
+                    //createUser in my user database,
+                    this.userService.createUser({
+                        isAnonymous, 
+                        isLogin: true,
+                        displayName,
+                        photoURL,
+                        userUid: uid,
+                        score: 0,
+                        role: 'guest',
                         roomUid,
                     })
                 ).pipe(
                     map(() => uid)
                 )
             }),
-            // switchMap((userUid: string) => {
-            //     let roomUid: string;
-            //     return from(
-            //         //createRoom in my user database 
-            //         this.roomService.createRoom(userUid)
-            //             .then((room) => {
-            //                 roomUid = room.key
-            //                 return this.userService.updateRoom(userUid, roomUid)
-            //             })
-            //     ).pipe(map(() => ({userUid, roomUid})))
-            // })
         ) 
     }
+    
     
 }

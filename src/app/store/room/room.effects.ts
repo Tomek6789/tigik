@@ -7,9 +7,9 @@ import { RoomsService } from "app/services/rooms.service";
 import { UserService } from "app/services/users.service";
 import { tap, switchMap, map, mergeMap, filter } from "rxjs/operators";
 import { from, of } from "rxjs";
-import { createRoom, finishGame, getRoom, getRoomSuccess, playerLeaveRoom, selectedElement, startGame, startGameSuccess } from "./room.actions";
+import { createRoom, finishGame, getRoom, getRoomSuccess, joinRoom, playerLeaveRoom, selectedElement, startGame, startGameSuccess } from "./room.actions";
 import { bestScoreSelector, isUserLoginSelector, roomUidSelector, scoreSelector, userRoleSelector, userUidSelector } from "../user/user.selectors";
-import { waitForActions, waitForProp } from "app/wait-for-actions";
+import { waitForActions, waitForProp, waitForProp2 } from "app/wait-for-actions";
 import { signInAsAnonymous, startGameForAnonymous, userStateChangedSuccess } from "../user/user.actions";
 import { guestUidSelector, searchingElementSelector } from "./room.selectors";
 
@@ -128,6 +128,18 @@ export class RoomEffects {
         }),
         map(() => getRoom())
     ))
+
+    joinRoom$ = createEffect(() => this.actions$.pipe(
+        ofType(joinRoom),
+        waitForActions([userStateChangedSuccess(null)], this.actions$),
+        concatLatestFrom(() => [
+            this.store.select(userUidSelector),
+        ]),
+        tap(([{ roomUid }, userUid]) => {
+            this.roomService.joinRoom(roomUid, userUid)
+
+        })
+    ), { dispatch: false })
 
     constructor(
         private actions$: Actions,

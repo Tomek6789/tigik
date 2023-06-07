@@ -8,7 +8,7 @@ import { AppState } from "./app.state";
 import { SnackBarService } from "./services/snackbar.service";
 import { UserService } from "./services/users.service";
 import { finishGame, getRoom, playerLeaveRoom, selectedElement, startGame } from "./store/room/room.actions";
-import { getLoginUser, userIsLogIn, signInUser, signOutUser,  inviteOpponent, removeOpponent } from "./store/user/user.actions";
+import { getLoginHostUser, userIsLogIn, signInUser, signOutUser,  inviteOpponent, removeOpponent, getLoginGuestUser, signForGuest } from "./store/user/user.actions";
 
 import UserState, { usersFeatureKey} from './store/user/user.reducer'
 import { isAnonymousSelector, isUserLoginSelector, opponentSelector, roomUidSelector, showInviteSelector, userRoleSelector, userSelector } from "./store/user/user.selectors";
@@ -60,10 +60,11 @@ export class AppComponent implements OnInit {
     console.log(roomUid)
     if(roomUid) {
       console.log('GUEST')
+      this.store.dispatch(signForGuest({ roomUid }))
+      this.store.dispatch(getLoginGuestUser({ roomUid }))
     } else {
       console.log('HOST')
-            this.store.dispatch(getLoginUser({ roomUid: undefined }))
-
+      this.store.dispatch(getLoginHostUser())
     }
 
     // this.inviteRoomUid$.subscribe((roomUid) => {

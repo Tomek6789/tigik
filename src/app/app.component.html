@@ -9,8 +9,14 @@
             (signIn)="onSingIn()" 
             (invite)="onInvitePlayer()">
 
-            <app-profile loggedUser *ngIf="isLogin$ | async"  [user]="user$ | async"  (signOut)="onSignOut()"></app-profile>
+            <app-profile loggedUser *ngIf="isLogin$ | async"  
+            
+                [user]="user$ | async" 
+                (signOut)="onSignOut()">
+            </app-profile>
+            
             <!-- [showLogout]="!(isAnonymous$ | async)" -->
+
             <app-profile opponentUser [user]="opponentPlayer$ | async"></app-profile>
 
         </app-menu>

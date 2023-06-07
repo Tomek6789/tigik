@@ -33,9 +33,13 @@ export const userStateChangedSuccess = createAction(
     props<{ user: User }>()
 )
 
-export const getLoginUser = createAction(
-    '[User] getLoginUser',
+export const getLoginGuestUser = createAction(
+    '[User] getLoginGuestUser',
     props<{ roomUid: string }>()
+)
+
+export const getLoginHostUser = createAction(
+    '[User] getLoginHostUser',
 )
 
 export const userIsLogIn = createAction(
@@ -64,4 +68,4 @@ export const inviteOpponent = createAction(
     props<{ roomUid: string }>()
 )
 
-export const changeUserRole = createAction('changeUserRole')
+export const changeUserRole = createAction('changeUserRole',     props<{ roomUid: string }>())

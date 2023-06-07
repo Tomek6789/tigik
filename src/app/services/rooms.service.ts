@@ -65,7 +65,6 @@ export class RoomsService {
 
   async startGame(roomUid: string, status: boolean, element: string) {
     const room = ref(this.db, ('rooms/' + roomUid))
-    console.log(roomUid)
     this.roomUid.next(roomUid)
     return await update(room, {
       startGame: status,

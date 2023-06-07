@@ -1,3 +1,4 @@
+import { createEffect } from "@ngrx/effects";
 import { createAction, props } from "@ngrx/store";
 import { RoomState } from "./room.reducer";
 
@@ -36,14 +37,11 @@ export const playerLeaveRoom = createAction(
     '[Room] playerLeaveRoom'
 )
 
-// export const guestLeaveRoom = createAction(
-//     '[Room] guestLeaveRoom'
-// )
-
-// export const hostLeaveRoom = createAction(
-//     '[Room] hostLeaveRoom'
-// )
-
 export const createRoom = createAction(
     '[Room] createRoom'
+)
+
+export const joinRoom = createAction(
+    '[Room] joinRoom',
+    props<{ roomUid: string }>()
 )
