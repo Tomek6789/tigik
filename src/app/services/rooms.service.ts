@@ -1,11 +1,7 @@
 import { Injectable } from "@angular/core";
-import { Database, ref, list, update, stateChanges, equalTo } from "@angular/fire/database";
-import { child, onValue, orderByKey, push, query, remove } from "@firebase/database";
-import { AuthService } from "app/auth/auth.service";
-import { User } from "app/auth/user.model";
+import { Database, ref, list, update, stateChanges, equalTo, get, remove, orderByKey, push, query, set,  } from "@angular/fire/database";
 import { Subject, Observable } from "rxjs";
-import { filter, map, shareReplay, switchMap, tap } from "rxjs/operators";
-import { UserService } from "./users.service";
+import { map, } from "rxjs/operators";
 
 export interface Room {
   key?: string;
@@ -40,17 +36,16 @@ export class RoomsService {
 
   createRoom(hostUid: string) {
     return push(ref(this.db, 'rooms'), {
-        hostUid,
-        guestUid: null,
+        players: [hostUid],
         startGame: false,
         searchingElement: null,
       });
   }
 
 
-  joinRoom(roomUid: string, guestUid: string) {
+  joinRoom(roomUid: string, playersUid: string[]) {
     const room = ref(this.db, ('rooms/' + roomUid))
-    update(room, { guestUid });
+    return update(room, { players: playersUid });
   }
 
   removeRoom(roomUid: string) {
@@ -58,10 +53,17 @@ export class RoomsService {
     remove(room)
   }
 
-  removeUserFromRoom(roomUid: string, role: string) {
+  removeUserFromRoomPlayers(roomUid: string, playersUid: string[]) {
     const room = ref(this.db, ('rooms/' + roomUid))
-    update(room, { [role]: null });
+    update(room, { players: playersUid });
   }
+
+
+  // setAsHost(roomUid: string, playerUid: string) {
+  //   const room = ref(this.db, ('rooms/' + roomUid))
+  //   update(room, { hostUid: playerUid });
+  // }
+
 
   async startGame(roomUid: string, status: boolean, element: string) {
     const room = ref(this.db, ('rooms/' + roomUid))

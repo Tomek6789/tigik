@@ -1,6 +1,6 @@
 import { createReducer, on } from "@ngrx/store";
 import { userIsLogIn, userStateChangedSuccess, signInUser, userIsLogOut, opponentStateChangedSuccess, removeOpponent } from "./user.actions";
-import { Role, User } from "app/auth/user.model";
+import { User } from "app/auth/user.model";
 
 export const usersFeatureKey = 'users';
 
@@ -12,7 +12,6 @@ export default interface UserState {
     roomUid: string;
     score?: number;
     bestScore?: number;
-    role?: Role;
     displayName?: string;
     photoURL?: string;
   }
@@ -35,7 +34,6 @@ export const initialState: UserState = {
     roomUid: null,
     score: null,
     bestScore: null,
-    role: null,
     displayName: null,
     photoURL: null,
   },

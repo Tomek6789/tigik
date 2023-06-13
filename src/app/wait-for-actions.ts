@@ -1,10 +1,10 @@
 import { Actions } from "@ngrx/effects";
 import { Action, Store } from "@ngrx/store";
-import { MonoTypeOperatorFunction, pipe, zip } from "rxjs";
+import { combineLatest, MonoTypeOperatorFunction, pipe, zip } from "rxjs";
 import { filter, first, map, switchMap, tap } from "rxjs/operators";
-import { roomUidSelector } from "./store/user/user.selectors";
+import { roomUidSelector, userUidSelector } from "./store/user/user.selectors";
 import { AppState } from "./app.module";
-import { guestUidSelector, hostUidSelector } from "./store/room/room.selectors";
+import { roomPlayersSelector } from "./store/room/room.selectors";
 
 function createObservable(event: Action, actions: Actions) {
     return actions.pipe(
@@ -31,13 +31,18 @@ export function waitForActions<T>(
     return pipe(switchMap((action) => zip(array).pipe(map(() => action))));
   }
 
-
-  export function waitForProp2<T>(
-    key: string,
+  export function waitForOpponent(
     store: Store<AppState>
-  ): MonoTypeOperatorFunction<T> {
-    const one = store.select(hostUidSelector).pipe(filter((Boolean)), first())
-    const two = store.select(guestUidSelector).pipe(filter((Boolean)), first())
+  ) {
+    const userUid = store.select(userUidSelector);
+    const opponent = store.select(roomPlayersSelector).pipe(filter((players) => players?.length === 2))
 
-    return pipe(switchMap((action) => zip(...[one, two]).pipe(map(() => action))));
+    return pipe(switchMap(() => 
+      combineLatest([userUid, opponent]).pipe(
+        map(([userUid, players]) => {        
+          return players.filter(uid => uid !== userUid)[0]
+        
+        })
+      )
+    ))
   }

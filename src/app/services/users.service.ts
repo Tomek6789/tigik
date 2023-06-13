@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Database, list, ref, stateChanges, update } from "@angular/fire/database";
 import { equalTo, orderByKey, query } from "@firebase/database";
 import { AuthService } from "app/auth/auth.service";
-import { Role, User } from "app/auth/user.model";
+import { User } from "app/auth/user.model";
 import { BehaviorSubject, from, iif, merge, Observable, of, Subject } from "rxjs";
 import { filter, switchMap, tap, map, take, shareReplay } from "rxjs/operators";
 
@@ -34,9 +34,8 @@ export class UserService {
         isAnonymous: user.isAnonymous,
         userUid: user.userUid,
         displayName: user.displayName || 'Annonymous',
-        photoURL: user.photoURL || 'missing',
+        photoURL: user.photoURL || '',
         score: 0,
-        role: user.role,
         roomUid: user.roomUid || null,
       });
   }
@@ -60,10 +59,4 @@ export class UserService {
     const user = ref(this.db, ('users/' + userUid));
     return update(user, { isLogin })
   }
-
-  updateRole(userUid: string, role: Role) {
-    const user = ref(this.db, ('users/' + userUid));
-    return update(user, { role })
-  }
-
 }

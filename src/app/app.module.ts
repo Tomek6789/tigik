@@ -27,7 +27,6 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RouterModule } from "@angular/router";
 import { AppComponent } from "./app.component";
 import { AuthModule } from "./auth/auth.module";
-import { RoomsDialogComponent } from "./dialogs/rooms-dialog/rooms-dialog.component";
 import { PeriodicTableService } from "./services/periodic-table.service";
 import { ProgressBarComponent } from "./components/progress-bar/progress-bar.component";
 import { UserService } from "./services/users.service";
@@ -48,6 +47,8 @@ import { provideAuth } from "@angular/fire/auth";
 import { getAuth } from "@firebase/auth";
 import { UserEffects } from "./store/user/user.effects";
 import { RoomEffects } from "./store/room/room.effects";
+import { getFunctions, provideFunctions } from '@angular/fire/functions';
+import { connectFunctionsEmulator } from "@firebase/functions";
 
 export interface AppState {
   [usersFeatureKey]: UserState,
@@ -56,10 +57,6 @@ export interface AppState {
 
 @NgModule({
   imports: [
-    // AngularFireModule.initializeApp(environment.firebaseConfig),
-    // AngularFirestoreModule,
-    // AngularFireAuthModule,
-    // AngularFireDatabaseModule,
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideFirestore(() => getFirestore()),
     provideDatabase(() => {
@@ -68,7 +65,12 @@ export interface AppState {
       return database
     }),
     provideAuth(() => getAuth()),
-
+    provideFunctions(() => {
+      const functions = getFunctions(getApp())
+      connectFunctionsEmulator(functions, '127.0.0.1', 5001)
+      return functions
+    }),
+    
     BrowserModule,
     BrowserAnimationsModule,
     RouterModule.forRoot([
@@ -107,7 +109,7 @@ export interface AppState {
     ProgressBarComponent,
 
     ProfileComponent,
-    RoomsDialogComponent,
+    
     PeriodicTableComponent,
     MenuComponent,
   ],

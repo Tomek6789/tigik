@@ -22,11 +22,16 @@ export const selectedElement = createAction(
 
 export const getRoom = createAction(
     '[Room] getRoom',
+    props<{ roomUid: string }>()
 )
 
 export const getRoomSuccess = createAction(
     '[Room] getRoomSuccess',
     props<{ room: RoomState }>()
+)
+
+export const getRoomFailure = createAction(
+    '[Room] getRoomFailure'
 )
 
 export const removeRoom = createAction(
@@ -43,5 +48,9 @@ export const createRoom = createAction(
 
 export const joinRoom = createAction(
     '[Room] joinRoom',
-    props<{ roomUid: string }>()
+    props<{ roomUid: string; userUid: string }>()
+)
+
+export const joinRooomSuccess = createAction(
+    '[Room] joinRooomSuccess'
 )
