@@ -1,5 +1,5 @@
 <mat-progress-bar
-
+  *ngIf="show$ | async"
   [color]="color"
   [mode]="mode"
   [value]="value$ | async"

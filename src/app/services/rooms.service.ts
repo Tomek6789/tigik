@@ -59,16 +59,10 @@ export class RoomsService {
   }
 
 
-  // setAsHost(roomUid: string, playerUid: string) {
-  //   const room = ref(this.db, ('rooms/' + roomUid))
-  //   update(room, { hostUid: playerUid });
-  // }
-
-
   async startGame(roomUid: string, status: boolean, element: string) {
     const room = ref(this.db, ('rooms/' + roomUid))
     this.roomUid.next(roomUid)
-    return await update(room, {
+    return update(room, {
       startGame: status,
       searchingElement: element,
     });
@@ -78,5 +72,14 @@ export class RoomsService {
     const room = ref(this.db, ('rooms/' + roomUid))
     update(room, { searchingElement: element });
   }
+
+  animate(roomUid: string, element: string, userUid: string) {
+    const room = ref(this.db, ('rooms/' + roomUid))
+    update(room, { animate: element, foundElement: userUid, searchingElement: null })
+  }
+
+  clearAnimate(roomUid: string) {
+    const room = ref(this.db, ('rooms/' + roomUid))
+    update(room, { animate: null, foundElement: null })  }
 
 }

@@ -11,7 +11,7 @@ import { getLoginUser, userIsLogIn, signInUser, signOutUser,  removeOpponent, si
 
 import UserState, { usersFeatureKey} from './store/user/user.reducer'
 import { isAnonymousSelector, isUserLoginSelector, opponentSelector, roomUidSelector, showInviteSelector, userSelector } from "./store/user/user.selectors";
-import { searchingElementSelector, startGameSelector } from "./store/room/room.selectors";
+import { animateElementSelector, searchingElementSelector, startGameSelector, foundElementSelector } from "./store/room/room.selectors";
 
 import { HttpClient } from "@angular/common/http";
 import { PeriodicTableService } from "./services/periodic-table.service";
@@ -29,19 +29,31 @@ interface State {
 })
 export class AppComponent implements OnInit {
    table$ = this.periodicTableService.getPeriodicTable();
-// user
-  isLogin$ = this.store.select(isUserLoginSelector)
-  isAnonymous$ = this.store.select(isAnonymousSelector)
-  user$ = this.store.select(userSelector)
-
-  // room
-  startGame$ = this.store.select(startGameSelector)
-  searchingElementChanged$ = this.store.select(searchingElementSelector);
-  opponentPlayer$ = this.store.select(opponentSelector);
-  showInvite$ = this.store.select(showInviteSelector);
-  roomUid$ = this.store.select(roomUidSelector);
-
+   foundElement$ = this.store.select(foundElementSelector);
+   animate$ = this.store.select(animateElementSelector);
+   // user
+   isLogin$ = this.store.select(isUserLoginSelector)
+   isAnonymous$ = this.store.select(isAnonymousSelector)
+   user$ = this.store.select(userSelector)
+   
+   // room
+   startGame$ = this.store.select(startGameSelector)
+   searchingElementChanged$ = this.store.select(searchingElementSelector);
+   opponentPlayer$ = this.store.select(opponentSelector);
+   showInvite$ = this.store.select(showInviteSelector);
+   roomUid$ = this.store.select(roomUidSelector);
+   
    http = inject(HttpClient)
+   
+   animateElement$ = combineLatest(
+     
+      [this.animate$, this.foundElement$, this.user$]
+     
+   ).pipe(filter(([animate, userUid, user]) => {
+     return userUid !== user.userUid
+   }), map(([animate]) => animate)) 
+   
+  //  this.store.select(animateElementSelector).pipe(withLatestFrom([this.user$, this.foundElement$]), filter(([animate, user, foundElementUid]) => user. ))
 
 
   @HostListener('window:beforeunload')

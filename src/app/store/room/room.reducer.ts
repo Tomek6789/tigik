@@ -8,6 +8,8 @@ export interface RoomState {
   players?: string[];
   startGame?: boolean;
   searchingElement?: string;
+  animate?: string;
+  foundElement?: string;
 }
 
 export const initialState: RoomState = {

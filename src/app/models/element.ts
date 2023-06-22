@@ -4,4 +4,5 @@ export interface Element {
     x: number;
     y: number;
     group: number;
+    animate: boolean;
 }

@@ -23,6 +23,7 @@
         <app-progress-bar *ngIf="startGame$ | async" (finish)="handleFinish($event)"
             [reset$]="searchingElementChanged$">
         </app-progress-bar>
-        <app-periodic-table [table]="table$ | async"
+        <app-periodic-table [table]="table$ | async"             [searchingElement]="searchingElementChanged$ | async"
+            [animate]="animateElement$ | async"
             (selected)="handleSelected($event)"></app-periodic-table>
 

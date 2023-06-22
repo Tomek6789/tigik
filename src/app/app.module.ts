@@ -23,6 +23,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import { MatProgressBarModule } from "@angular/material/progress-bar";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { BrowserModule } from "@angular/platform-browser";
+import {MatRippleModule} from '@angular/material/core';
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RouterModule } from "@angular/router";
 import { AppComponent } from "./app.component";
@@ -93,6 +94,7 @@ export interface AppState {
     MatListModule,
     MatIconModule,
     MatTooltipModule,
+    MatRippleModule,
 
     ClipboardModule,
     AuthModule,

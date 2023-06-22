@@ -27,3 +27,14 @@ export const searchingElementSelector = createSelector(
     roomSelector,
     room => room.searchingElement
 )
+
+export const animateElementSelector = createSelector(
+    roomSelector,
+    room => room.animate
+)
+
+
+export const foundElementSelector = createSelector(
+    roomSelector,
+    room => room.foundElement
+)

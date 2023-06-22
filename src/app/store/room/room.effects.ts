@@ -75,15 +75,19 @@ export class RoomEffects {
             this.store.select(userUidSelector),
             this.store.select(roomUidSelector),
             this.store.select(scoreSelector),
-            this.store.select(searchingElementSelector),
         ]),
-        tap(([action, userUid, roomUid , score, searchingElement ]) => {
-            if(searchingElement === action.selectedElement) {
-                this.roomService.searchingElement(roomUid, this.randomElement(score))
+        tap(([action, userUid, roomUid , score ]) => {
+            console.log(userUid)
+                this.roomService.animate(roomUid, action.selectedElement, userUid);
+
+                setTimeout(() => {
+                    console.log('newEleletToSeearch')
+                    this.roomService.searchingElement(roomUid, this.randomElement(score))
+                }, 800);
+
                 this.userService.updateScore(userUid, score + 10 )
                 return startGameSuccess()
                 
-            }
         })
     ), { dispatch: false })
 
@@ -100,6 +104,7 @@ export class RoomEffects {
                     this.userService.updateBestScore(userUid, score)
                 }
                 this.roomService.startGame(roomUid, false, null);
+                this.roomService.clearAnimate(roomUid);
                 this.userService.updateScore(userUid, 0);
                 
             })
