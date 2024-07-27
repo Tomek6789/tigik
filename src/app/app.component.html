@@ -1,5 +1,8 @@
 
+        <app-progress-bar (finish)="handleFinish($event)"
+        [reset$]="searchingElementChanged$">
 
+        </app-progress-bar>
         <app-menu 
             [isStartGame]="startGame$ | async" 
             [isLogin]="isLogin$ | async" 
@@ -9,15 +12,19 @@
             (signIn)="onSingIn()" 
             (invite)="onInvitePlayer()">
 
-            <app-profile loggedUser *ngIf="isLogin$ | async"  [user]="user$ | async"  (signOut)="onSignOut()"></app-profile>
+            <app-profile loggedUser *ngIf="isLogin$ | async"  
+            
+                [user]="user$ | async" 
+                (signOut)="onSignOut()">
+            </app-profile>
+            
             <!-- [showLogout]="!(isAnonymous$ | async)" -->
+
             <app-profile opponentUser [user]="opponentPlayer$ | async"></app-profile>
 
         </app-menu>
-        <app-progress-bar *ngIf="startGame$ | async" (finish)="handleFinish($event)"
-            [reset$]="searchingElementChanged$">
-        </app-progress-bar>
-        <app-periodic-table [table]="table$ | async"
+
+        <app-periodic-table [table]="table$ | async"             [searchingElement]="searchingElementChanged$ | async"
+            [animate]="animateElement$ | async"
             (selected)="handleSelected($event)"></app-periodic-table>
 
-            <button (click)="test()">TEST</button>

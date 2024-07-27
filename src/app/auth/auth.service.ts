@@ -1,5 +1,5 @@
 import { inject, Injectable } from "@angular/core";
-import { Auth, signInWithPopup,  signInAnonymously, GoogleAuthProvider, signOut, signInWithCustomToken,  } from "@angular/fire/auth";
+import { Auth, signInWithPopup,  signInAnonymously, GoogleAuthProvider, signOut,  } from "@angular/fire/auth";
 import { Observable, Subject } from "rxjs";
 import { User } from "./user.model";
 
@@ -13,9 +13,14 @@ export class AuthService {
 
   private auth: Auth = inject(Auth);
 
+  userCreated = false
+
   constructor() {
     this.auth.onAuthStateChanged(user => {
       console.log(user)
+      if(user) {
+        this.userCreated = true
+      }
       this.authStateChangedSubject.next(user?.uid)
     })
   }

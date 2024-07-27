@@ -5,13 +5,15 @@ export const roomFeatureKey = 'room';
 
 export interface RoomState {
   key?: string;
-  guestUid?: string;
-  hostUid?: string;
+  players?: string[];
   startGame?: boolean;
   searchingElement?: string;
+  animate?: string;
+  foundElement?: string;
 }
 
 export const initialState: RoomState = {
+  players: null
 };
 
 export const reducerRoom = createReducer(

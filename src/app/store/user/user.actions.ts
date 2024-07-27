@@ -2,12 +2,17 @@ import { createAction, props } from "@ngrx/store";
 import { User } from "app/auth/user.model";
 import { Opponent } from "./user.reducer";
 
+export const signForGuest = createAction(
+    '[User] signForGuest',
+    props<{ roomUid: string }>()
+)
+
 export const signInAsAnonymous = createAction(
     '[User] signInAsAnonymous'
 )
 
-export const signInAsAnonymousSuccess = createAction(
-    '[User] signInAsAnonymousSuccess'
+export const startGameForAnonymous = createAction(
+    '[User] startGameForAnonymous'
 )
 
 export const signInUser = createAction(
@@ -27,6 +32,11 @@ export const userStateChangedSuccess = createAction(
     '[User] userStateChangedSuccess',
     props<{ user: User }>()
 )
+
+// export const getLoginGuestUser = createAction(
+//     '[User] getLoginGuestUser',
+//     props<{ roomUid: string }>()
+// )
 
 export const getLoginUser = createAction(
     '[User] getLoginUser',
@@ -54,7 +64,7 @@ export const opponentStateChangedSuccess = createAction(
     props<{ opponent: Opponent }>()
 )
 
-export const inviteOpponent = createAction(
-    '[Opponent] inviteOpponent',
-    props<{ roomUid: string }>()
-)
+// export const inviteOpponent = createAction(
+//     '[Opponent] inviteOpponent',
+//     props<{ roomUid: string }>()
+// )

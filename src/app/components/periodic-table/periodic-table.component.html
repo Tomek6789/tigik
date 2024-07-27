@@ -1,8 +1,11 @@
 <div class="periodicTable">
   <div
     *ngFor="let element of table"
+    matRipple
+    [matRippleCentered]="true"
+    [@tada]="element.animate"
     class="border box {{ 'element-' + element.symbol }}"
-    (click)="handleSelected(element.symbol)"
+    (click)="handleSelected(element)"
   >
     {{ element.symbol }}
   </div>

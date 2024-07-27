@@ -33,11 +33,6 @@ export const bestScoreSelector = createSelector(
     user => user.bestScore
 )
 
-export const userRoleSelector = createSelector(
-    userSelector,
-    user => user.role
-)
-
 export const opponentSelector = createSelector(
     selectUsers,
     users => users.opponent
