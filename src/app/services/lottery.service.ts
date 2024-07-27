@@ -13,12 +13,21 @@ const Test = {
 })
 export class LotteryService {
   public element = "Na";
+  previuosElement = null
 
   private table = [];
   drawElement(score: number) {
     this.table = this.table.concat(Test[this.currentLevel(score)]);
-    return this.findElement();
+    
+    let currentElement = null;
+    currentElement = this.findElement();
+    while(this.previuosElement === currentElement) {
+      currentElement = this.findElement()
+    } 
+    this.previuosElement = currentElement
+    return currentElement;
   }
+
 
   public currentLevel(score: number): string {
     switch (true) {

@@ -1,5 +1,8 @@
 
+        <app-progress-bar (finish)="handleFinish($event)"
+        [reset$]="searchingElementChanged$">
 
+        </app-progress-bar>
         <app-menu 
             [isStartGame]="startGame$ | async" 
             [isLogin]="isLogin$ | async" 
@@ -20,9 +23,7 @@
             <app-profile opponentUser [user]="opponentPlayer$ | async"></app-profile>
 
         </app-menu>
-        <app-progress-bar *ngIf="startGame$ | async" (finish)="handleFinish($event)"
-            [reset$]="searchingElementChanged$">
-        </app-progress-bar>
+
         <app-periodic-table [table]="table$ | async"             [searchingElement]="searchingElementChanged$ | async"
             [animate]="animateElement$ | async"
             (selected)="handleSelected($event)"></app-periodic-table>
