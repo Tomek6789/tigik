@@ -22,6 +22,6 @@
         </app-menu>
 
         <app-periodic-table [table]="table$ | async"             [searchingElement]="searchingElementChanged$ | async"
-            [animate]="animateElement$ | async"
+            [animate]="animate$ | async"
             (selected)="handleSelected($event)"></app-periodic-table>
 

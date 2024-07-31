@@ -7,7 +7,7 @@ import { Element } from "app/models/element";
   templateUrl: "./periodic-table.component.html",
   styleUrls: ["./periodic-table.component.css"],
   animations: [
-    tadaAnimation({direction: '=>', duration: 800})
+    tadaAnimation({direction: '=>', duration: 500})
   ]
 })
 export class PeriodicTableComponent implements OnChanges {
