@@ -13,8 +13,9 @@ import {
   signInAsAnonymous,
   startGameForAnonymous,
   signForGuest,
+  updateRoomUid,
 } from "./user.actions";
-import { filter, map, mergeMap, switchMap, tap } from "rxjs/operators";
+import { filter, map, mergeMap, switchMap, take, tap } from "rxjs/operators";
 import { from, of, pipe } from "rxjs";
 import { Injectable } from "@angular/core";
 import { UserService } from "app/services/users.service";
@@ -38,13 +39,14 @@ export class UserEffects {
       ofType(getLoginUser),
       switchMap(({ roomUid }) => {
         return this.auth.authStateChanged$.pipe(
-          map((userUid) => ({ userUid, roomUid }))
+          map((userUid) => ({ userUid, roomUid })),
         );
       }),
       mergeMap(({ userUid, roomUid }) => {
         console.log("Auth change", { roomUid, userUid });
         const actions: Action[] = [];
         if (userUid) {
+          // host user
           actions.push(
             userIsLogIn({ userUid }),
             getOpponent(),
@@ -53,11 +55,14 @@ export class UserEffects {
         }
 
         if (roomUid && userUid != null) {
-          actions.push(joinRoom({ roomUid, userUid }), getRoom({ roomUid }));
+          // for opponent when join via link
+          // first getRoom and then join
+          actions.push(joinRoom({ roomUid, userUid }));
         }
 
         if (userUid && roomUid == null) {
-          actions.push(createRoom());
+          // for host always create room
+          actions.push(createRoom({userUid}));
         }
 
         if (userUid == null) {
@@ -132,6 +137,8 @@ export class UserEffects {
     )
   );
 
+  // above are auth effects
+
   getUser$ = createEffect(() =>
     this.actions$.pipe(
       ofType(getUser),
@@ -156,6 +163,14 @@ export class UserEffects {
       })
     )
   );
+
+  updateRoom$ = createEffect(() => 
+    this.actions$.pipe(
+    ofType(updateRoomUid),
+    tap(({roomUid, userUid}) => {
+      this.userService.updateRoomUid(userUid, roomUid);
+    }),
+  ), { dispatch: false })
 
   constructor(
     private actions$: Actions,

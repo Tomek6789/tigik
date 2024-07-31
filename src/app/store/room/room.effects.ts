@@ -19,13 +19,14 @@ import {
   finishGame,
   getRoom,
   getRoomFailure,
-  getRoomSuccess,
+  roomStateChangedSuccess,
   joinRoom,
-  joinRooomSuccess,
+  joinRoomSuccess,
   playerLeaveRoom,
   selectedElement,
   startGame,
   startGameSuccess,
+  createRoomSuccess,
 } from "./room.actions";
 import {
   bestScoreSelector,
@@ -34,16 +35,10 @@ import {
   scoreSelector,
   userUidSelector,
 } from "../user/user.selectors";
-import { waitForActions, waitForProp } from "app/wait-for-actions";
 import {
   signInAsAnonymous,
-  startGameForAnonymous,
-  userStateChangedSuccess,
+  updateRoomUid,
 } from "../user/user.actions";
-import {
-  roomPlayersSelector,
-  searchingElementSelector,
-} from "./room.selectors";
 import { Test } from "app/services/callable-functions";
 import { SnackBarService } from "app/services/snackbar.service";
 
@@ -60,7 +55,7 @@ export class RoomEffects {
               return this.roomService.onMyRoomStateChanged(roomUid);
             }),
             map((room) => {
-              return getRoomSuccess({ room });
+              return roomStateChangedSuccess({ room });
             }),
             catchError(() => {
               this.snackBarService.openSnackBar(
@@ -69,6 +64,33 @@ export class RoomEffects {
               return of(getRoomFailure());
             })
           );
+      })
+    )
+  );
+
+  createRoom$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(createRoom),
+      switchMap(({userUid}) => {
+        let roomUid: string;
+        return from(
+          this.roomService.createRoom(userUid).then((room) => {
+            roomUid = room.key;
+          })
+        ).pipe(map(() => ({ roomUid, userUid })));
+      }),
+      mergeMap(({ userUid, roomUid }) => [getRoom({ roomUid }), updateRoomUid({ userUid, roomUid}), createRoomSuccess()])
+    )
+  );
+
+  joinRoom$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(joinRoom),
+      tap( async ({ roomUid, userUid }) => {
+        await this.roomService.joinRoom(roomUid, userUid);
+      }),
+      mergeMap(({ userUid, roomUid }) => {
+        return [getRoom({ roomUid }), updateRoomUid({ userUid, roomUid }), joinRoomSuccess()];
       })
     )
   );
@@ -93,22 +115,6 @@ export class RoomEffects {
     )
   );
 
-  startGameForAnonymous$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(startGameForAnonymous),
-      waitForActions([getRoomSuccess(null)], this.actions$),
-      concatLatestFrom(() => [
-        this.store.select(roomUidSelector),
-        this.store.select(scoreSelector),
-      ]),
-      switchMap(([action, roomUid, score]) => {
-        return from(
-          this.roomService.startGame(roomUid, true, this.randomElement(score))
-        ).pipe(map(() => startGameSuccess()));
-      })
-    )
-  );
-
   selectedElement$ = createEffect(
     () =>
       this.actions$.pipe(
@@ -119,11 +125,9 @@ export class RoomEffects {
           this.store.select(scoreSelector),
         ]),
         tap(([action, userUid, roomUid, score]) => {
-          console.log(userUid);
           this.roomService.animate(roomUid, action.selectedElement, userUid);
 
           setTimeout(() => {
-            console.log("newEleletToSeearch");
             this.roomService.searchingElement(
               roomUid,
               this.randomElement(score)
@@ -159,70 +163,34 @@ export class RoomEffects {
     { dispatch: false }
   );
 
-  playerLeaveRoom$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(playerLeaveRoom),
-        concatLatestFrom(() => [
-          this.store.select(userUidSelector),
-          this.store.select(roomUidSelector),
-          this.store
-            .select(roomPlayersSelector)
-            .pipe(filter<string[]>(Boolean)),
-        ]),
-        tap(([action, userUid, roomUid, players]) => {
-          const all = players.filter((uid) => uid !== userUid);
-          if (all.length === 1) {
-            this.roomService.removeUserFromRoomPlayers(roomUid, all);
-          }
+  // playerLeaveRoom$ = createEffect(
+  //   () =>
+  //     this.actions$.pipe(
+  //       ofType(playerLeaveRoom),
+  //       concatLatestFrom(() => [
+  //         this.store.select(userUidSelector),
+  //         this.store.select(roomUidSelector),
+  //         this.store
+  //           .select(roomPlayersSelector)
+  //           .pipe(filter<string[]>(Boolean)),
+  //       ]),
+  //       tap(([action, userUid, roomUid, players]) => {
+  //         const all = players.filter((uid) => uid !== userUid);
+  //         if (all.length === 1) {
+  //           this.roomService.removeUserFromRoomPlayers(roomUid, all);
+  //         }
 
-          if (all.length === 0) {
-            this.roomService.removeRoom(roomUid);
-          }
-          this.userService.updateRoom(userUid, null);
-          this.userService.updateIsLogin(userUid, false);
-        })
-      ),
-    { dispatch: false }
-  );
+  //         if (all.length === 0) {
+  //           this.roomService.removeRoom(roomUid);
+  //         }
+  //         this.userService.updateRoom(userUid, null);
+  //         this.userService.updateIsLogin(userUid, false);
+  //       })
+  //     ),
+  //   { dispatch: false }
+  // );
 
-  createRoom$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(createRoom),
-      waitForActions([userStateChangedSuccess(null)], this.actions$),
-      concatLatestFrom(() => [this.store.select(userUidSelector)]),
-      switchMap(([action, userUid]) => {
-        let roomUid: string;
-        return from(
-          this.roomService.createRoom(userUid).then((room) => {
-            roomUid = room.key;
-            return this.userService.updateRoom(userUid, roomUid);
-          })
-        ).pipe(map(() => ({ roomUid })));
-      }),
-      map(({ roomUid }) => getRoom({ roomUid }))
-    )
-  );
 
-  joinRoom$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(joinRoom),
-      waitForActions([getRoomSuccess(null)], this.actions$),
-      concatLatestFrom(() => [this.store.select(roomPlayersSelector)]),
-      tap(async ([{ roomUid, userUid }, players]) => {
-        console.log("join befero wait", { userUid, roomUid });
-        await this.userService.updateRoom(userUid, roomUid);
-
-        const all = [...players, userUid];
-        console.log("join", all, "ooom", roomUid);
-        await this.roomService.joinRoom(roomUid, all);
-      }),
-      map(() => {
-        console.log("join succeess");
-        return joinRooomSuccess();
-      })
-    )
-  );
 
   constructor(
     private actions$: Actions,

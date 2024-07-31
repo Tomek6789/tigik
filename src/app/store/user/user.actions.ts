@@ -64,6 +64,11 @@ export const opponentStateChangedSuccess = createAction(
     props<{ opponent: Opponent }>()
 )
 
+export const updateRoomUid = createAction(
+   '[User] updateRoomUid',
+   props<{ userUid: string, roomUid: string}>()
+)
+
 // export const inviteOpponent = createAction(
 //     '[Opponent] inviteOpponent',
 //     props<{ roomUid: string }>()

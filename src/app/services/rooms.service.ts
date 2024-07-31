@@ -36,16 +36,16 @@ export class RoomsService {
 
   createRoom(hostUid: string) {
     return push(ref(this.db, 'rooms'), {
-        players: [hostUid],
+        players: { hostUid },
         startGame: false,
         searchingElement: null,
       });
   }
 
 
-  joinRoom(roomUid: string, playersUid: string[]) {
-    const room = ref(this.db, ('rooms/' + roomUid))
-    return update(room, { players: playersUid });
+  async joinRoom(roomUid: string, opponentUid: string) {
+    const roomPlayers = ref(this.db, ('rooms/' + roomUid + '/players'))
+    return update(roomPlayers, { opponentUid });
   }
 
   removeRoom(roomUid: string) {

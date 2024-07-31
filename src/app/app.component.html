@@ -17,10 +17,7 @@
                 [user]="user$ | async" 
                 (signOut)="onSignOut()">
             </app-profile>
-            
-            <!-- [showLogout]="!(isAnonymous$ | async)" -->
-
-            <app-profile opponentUser [user]="opponentPlayer$ | async"></app-profile>
+            <app-profile opponentUser [showLogout]="false" [user]="opponentPlayer$ | async"></app-profile>
 
         </app-menu>
 
