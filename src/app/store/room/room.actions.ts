@@ -61,3 +61,11 @@ export const joinRoom = createAction(
 export const joinRoomSuccess = createAction(
     '[Room] joinRoomSuccess'
 )
+
+export const roomRemovedSuccess = createAction(
+    '[Room] roomRemovedSuccess'
+)
+
+export const listenRoomRemoved = createAction(
+    '[Room] listenRoomRemoved',
+)

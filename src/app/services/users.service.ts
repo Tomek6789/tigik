@@ -52,10 +52,13 @@ export class UserService {
 
   updateRoomUid(userUid: string, roomUid: string) {
     const user = ref(this.db, ('users/' + userUid))
+    
     return update(user, {  roomUid  })
   }
 
   updateIsLogin(userUid: string, isLogin: boolean) {
+    if(userUid == null) return
+
     const user = ref(this.db, ('users/' + userUid));
     return update(user, { isLogin })
   }

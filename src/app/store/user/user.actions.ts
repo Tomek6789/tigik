@@ -33,10 +33,6 @@ export const userStateChangedSuccess = createAction(
     props<{ user: User }>()
 )
 
-// export const getLoginGuestUser = createAction(
-//     '[User] getLoginGuestUser',
-//     props<{ roomUid: string }>()
-// )
 
 export const getLoginUser = createAction(
     '[User] getLoginUser',
@@ -67,6 +63,11 @@ export const opponentStateChangedSuccess = createAction(
 export const updateRoomUid = createAction(
    '[User] updateRoomUid',
    props<{ userUid: string, roomUid: string}>()
+)
+
+export const removeRoomUid = createAction(
+    '[User] removeRoomUid',
+    props<{ userUid: string }>()
 )
 
 // export const inviteOpponent = createAction(

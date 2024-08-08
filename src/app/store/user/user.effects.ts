@@ -11,12 +11,11 @@ import {
   getOpponent,
   opponentStateChangedSuccess,
   signInAsAnonymous,
-  startGameForAnonymous,
-  signForGuest,
   updateRoomUid,
+  removeRoomUid,
 } from "./user.actions";
-import { filter, map, mergeMap, switchMap, take, tap } from "rxjs/operators";
-import { from, of, pipe } from "rxjs";
+import { map, mergeMap, switchMap, tap } from "rxjs/operators";
+import { from, pipe } from "rxjs";
 import { Injectable } from "@angular/core";
 import { UserService } from "app/services/users.service";
 import { UserCredential } from "@firebase/auth";
@@ -27,7 +26,7 @@ import {
   playerLeaveRoom,
 } from "../room/room.actions";
 import { Action, Store } from "@ngrx/store";
-import { roomUidSelector, userUidSelector } from "./user.selectors";
+import { userUidSelector } from "./user.selectors";
 import { waitForOpponent } from "app/wait-for-actions";
 import { AppState } from "app/app.module";
 import { Test } from "app/services/callable-functions";
@@ -164,11 +163,19 @@ export class UserEffects {
     )
   );
 
-  updateRoom$ = createEffect(() => 
+  updateRoomUid$ = createEffect(() => 
     this.actions$.pipe(
     ofType(updateRoomUid),
     tap(({roomUid, userUid}) => {
       this.userService.updateRoomUid(userUid, roomUid);
+    }),
+  ), { dispatch: false })
+
+  removeRoomUid$ = createEffect(() => 
+    this.actions$.pipe(
+    ofType(removeRoomUid),
+    tap(({userUid}) => {
+      this.userService.updateRoomUid(userUid, '');
     }),
   ), { dispatch: false })
 

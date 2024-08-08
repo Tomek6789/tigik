@@ -17,6 +17,7 @@ import { SnackBarService } from "./services/snackbar.service";
 import { UserService } from "./services/users.service";
 import {
   finishGame,
+  listenRoomRemoved,
   playerLeaveRoom,
   selectedElement,
   startGame,
@@ -26,7 +27,6 @@ import {
   userIsLogIn,
   signInUser,
   signOutUser,
-  removeOpponent,
   signForGuest,
 } from "./store/user/user.actions";
 
@@ -43,7 +43,6 @@ import {
   animateElementSelector,
   searchingElementSelector,
   startGameSelector,
-  foundElementSelector,
 } from "./store/room/room.selectors";
 
 import { HttpClient } from "@angular/common/http";
@@ -60,7 +59,6 @@ interface State {
 })
 export class AppComponent implements OnInit {
   table$ = this.periodicTableService.getPeriodicTable();
-  foundElement$ = this.store.select(foundElementSelector);
   animate$ = this.store.select(animateElementSelector);
   // user
   isLogin$ = this.store.select(isUserLoginSelector);
@@ -75,18 +73,6 @@ export class AppComponent implements OnInit {
   roomUid$ = this.store.select(roomUidSelector);
 
   http = inject(HttpClient);
-
-  animateElement$ = combineLatest([
-    this.animate$,
-    this.foundElement$,
-    this.user$,
-  ]).pipe(
-    filter(([animate, userUid, user]) => {
-      console.log("STAS", { animate, userUid, lol: user.userUid });
-      return userUid !== user.userUid;
-    }),
-    map(([animate]) => animate)
-  );
 
   @HostListener("window:beforeunload")
   beforeUnloadHandler() {
@@ -107,6 +93,9 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     const roomUid = window.location.href.split("=")[1];
     this.store.dispatch(getLoginUser({ roomUid }));
+
+    //listen for room removed when host leave a room
+    this.store.dispatch(listenRoomRemoved())
   }
 
   handleFinish() {

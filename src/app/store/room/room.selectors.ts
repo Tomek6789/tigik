@@ -24,8 +24,3 @@ export const animateElementSelector = createSelector(
     room => room.animate
 )
 
-
-export const foundElementSelector = createSelector(
-    roomSelector,
-    room => room.foundElement
-)

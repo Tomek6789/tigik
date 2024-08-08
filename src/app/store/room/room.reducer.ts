@@ -1,5 +1,5 @@
 import { createReducer, on } from "@ngrx/store";
-import { roomStateChangedSuccess, removeRoom } from "./room.actions";
+import { roomStateChangedSuccess, removeRoom, roomRemovedSuccess } from "./room.actions";
 
 export const roomFeatureKey = 'room';
 
@@ -15,6 +15,8 @@ export interface RoomState {
   foundElement?: string;
 }
 
+export type Players = RoomState['players']; 
+
 export const initialState: RoomState = {
   players: null
 };
@@ -24,5 +26,4 @@ export const reducerRoom = createReducer(
 
   on(roomStateChangedSuccess, (state, action) => ({ ...action.room })),
 
-  // on(removeRoom, () => initialState)
 );
