@@ -25,8 +25,8 @@ export const getRoom = createAction(
     props<{ roomUid: string }>()
 )
 
-export const getRoomSuccess = createAction(
-    '[Room] getRoomSuccess',
+export const roomStateChangedSuccess = createAction(
+    '[Room] roomStateChangedSuccess',
     props<{ room: RoomState }>()
 )
 
@@ -43,7 +43,14 @@ export const playerLeaveRoom = createAction(
 )
 
 export const createRoom = createAction(
-    '[Room] createRoom'
+    '[Room] createRoom',
+    // userUid for which we need to create room
+    // then we add user to room/players
+    props<{ userUid: string}>()
+)
+
+export const createRoomSuccess = createAction(
+    '[Room] createRoomSuccess'
 )
 
 export const joinRoom = createAction(
@@ -51,6 +58,14 @@ export const joinRoom = createAction(
     props<{ roomUid: string; userUid: string }>()
 )
 
-export const joinRooomSuccess = createAction(
-    '[Room] joinRooomSuccess'
+export const joinRoomSuccess = createAction(
+    '[Room] joinRoomSuccess'
+)
+
+export const roomRemovedSuccess = createAction(
+    '[Room] roomRemovedSuccess'
+)
+
+export const listenRoomRemoved = createAction(
+    '[Room] listenRoomRemoved',
 )

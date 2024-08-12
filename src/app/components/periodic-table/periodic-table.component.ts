@@ -7,7 +7,7 @@ import { Element } from "app/models/element";
   templateUrl: "./periodic-table.component.html",
   styleUrls: ["./periodic-table.component.css"],
   animations: [
-    tadaAnimation({direction: '=>', duration: 800})
+    tadaAnimation({direction: '=>', duration: 500})
   ]
 })
 export class PeriodicTableComponent implements OnChanges {
@@ -18,7 +18,6 @@ export class PeriodicTableComponent implements OnChanges {
   @Output() selected: EventEmitter<string> = new EventEmitter();
 
   ngOnChanges() {
-    console.log('ngOnChnages',this.animate)
     if(this.animate) {
 
       this.table.forEach((element) => {
@@ -42,14 +41,4 @@ export class PeriodicTableComponent implements OnChanges {
       this.selected.emit(element.symbol);
     }
   }
-
-
-  // private animate(element: Element) {
-  //     element.animate = false
-      
-  //     setTimeout(() => {
-  //       element.animate = true
-  //     }, 1)
-    
-  // }
 }

@@ -5,6 +5,7 @@
     [matRippleCentered]="true"
     [@tada]="element.animate"
     class="border box {{ 'element-' + element.symbol }}"
+    [class.color]="element.animate && !searchingElement"
     (click)="handleSelected(element)"
   >
     {{ element.symbol }}

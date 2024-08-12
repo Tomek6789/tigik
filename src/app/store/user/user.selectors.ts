@@ -1,5 +1,6 @@
 import { createFeatureSelector, createSelector } from "@ngrx/store";
 import UserState, { usersFeatureKey } from "./user.reducer";
+import { roomPlayersSelector } from "../room/room.selectors";
 
 export const selectUsers = createFeatureSelector<UserState>(usersFeatureKey);
 
@@ -47,3 +48,4 @@ export const isAnonymousSelector = createSelector(
     userSelector,
     user => user.isAnonymous
 )
+

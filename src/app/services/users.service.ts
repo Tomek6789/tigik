@@ -50,12 +50,15 @@ export class UserService {
     update(user, { score })
   }
 
-  updateRoom(userUid: string, roomUid: string) {
+  updateRoomUid(userUid: string, roomUid: string) {
     const user = ref(this.db, ('users/' + userUid))
+    
     return update(user, {  roomUid  })
   }
 
   updateIsLogin(userUid: string, isLogin: boolean) {
+    if(userUid == null) return
+
     const user = ref(this.db, ('users/' + userUid));
     return update(user, { isLogin })
   }

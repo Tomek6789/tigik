@@ -5,6 +5,10 @@
   margin: 0 2%;
 }
 
+.color {
+  background-color: #e93838 !important;
+}
+
 .find {
   grid-column: 7/10;
   grid-row: 1/3;

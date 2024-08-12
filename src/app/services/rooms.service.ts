@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
-import { Database, ref, list, update, stateChanges, equalTo, get, remove, orderByKey, push, query, set,  } from "@angular/fire/database";
+import { Database, ref, list, update, stateChanges, equalTo, get, remove, orderByKey, push, query, set, onChildRemoved  } from "@angular/fire/database";
+import { Players } from "app/store/room/room.reducer";
 import { Subject, Observable } from "rxjs";
 import { map, } from "rxjs/operators";
 
@@ -24,28 +25,35 @@ export class RoomsService {
   roomUid = new Subject<string>()
   roomUid$ = this.roomUid.asObservable()
 
+  roomRemoved = new Subject()
+  roomRemoved$ = this.roomRemoved.asObservable()
+
   onMyRoomStateChanged(roomUid: string): Observable<Room> {
-    console.log(roomUid)
     const room = ref(this.db, 'rooms');
     const queryRes = query(room, orderByKey(), equalTo(roomUid));
 
-    console.log('get room')
     return stateChanges(queryRes)
-      .pipe(map(user => user.snapshot.val()))
+      .pipe(map(room => {
+        if(room.event === 'child_removed') {
+          this.roomRemoved.next()
+          return {}
+        }
+        return  room.snapshot.val()
+      }))
   }
 
   createRoom(hostUid: string) {
     return push(ref(this.db, 'rooms'), {
-        players: [hostUid],
+        players: { hostUid },
         startGame: false,
         searchingElement: null,
       });
   }
 
 
-  joinRoom(roomUid: string, playersUid: string[]) {
-    const room = ref(this.db, ('rooms/' + roomUid))
-    return update(room, { players: playersUid });
+  async joinRoom(roomUid: string, opponentUid: string) {
+    const roomPlayers = ref(this.db, ('rooms/' + roomUid + '/players'))
+    return update(roomPlayers, { opponentUid });
   }
 
   removeRoom(roomUid: string) {
@@ -53,13 +61,15 @@ export class RoomsService {
     remove(room)
   }
 
-  removeUserFromRoomPlayers(roomUid: string, playersUid: string[]) {
+  removeOpponentFromRoom(roomUid: string, players: Players) {
     const room = ref(this.db, ('rooms/' + roomUid))
-    update(room, { players: playersUid });
+    update(room, { players });
   }
 
 
   async startGame(roomUid: string, status: boolean, element: string) {
+    if(roomUid === null) return
+
     const room = ref(this.db, ('rooms/' + roomUid))
     this.roomUid.next(roomUid)
     return update(room, {
@@ -75,11 +85,13 @@ export class RoomsService {
 
   animate(roomUid: string, element: string, userUid: string) {
     const room = ref(this.db, ('rooms/' + roomUid))
-    update(room, { animate: element, foundElement: userUid, searchingElement: null })
+    update(room, { animate: element, searchingElement: null })
   }
 
   clearAnimate(roomUid: string) {
+    if(roomUid === null) return
+
     const room = ref(this.db, ('rooms/' + roomUid))
-    update(room, { animate: null, foundElement: null })  }
+    update(room, { animate: null, })  }
 
 }

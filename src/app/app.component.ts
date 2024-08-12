@@ -17,6 +17,7 @@ import { SnackBarService } from "./services/snackbar.service";
 import { UserService } from "./services/users.service";
 import {
   finishGame,
+  listenRoomRemoved,
   playerLeaveRoom,
   selectedElement,
   startGame,
@@ -26,8 +27,10 @@ import {
   userIsLogIn,
   signInUser,
   signOutUser,
-  removeOpponent,
   signForGuest,
+  userIsLogOut,
+  updateIsLogin,
+  removeRoomUid,
 } from "./store/user/user.actions";
 
 import UserState, { usersFeatureKey } from "./store/user/user.reducer";
@@ -38,12 +41,12 @@ import {
   roomUidSelector,
   showInviteSelector,
   userSelector,
+  userUidSelector,
 } from "./store/user/user.selectors";
 import {
   animateElementSelector,
   searchingElementSelector,
   startGameSelector,
-  foundElementSelector,
 } from "./store/room/room.selectors";
 
 import { HttpClient } from "@angular/common/http";
@@ -60,12 +63,12 @@ interface State {
 })
 export class AppComponent implements OnInit {
   table$ = this.periodicTableService.getPeriodicTable();
-  foundElement$ = this.store.select(foundElementSelector);
   animate$ = this.store.select(animateElementSelector);
   // user
   isLogin$ = this.store.select(isUserLoginSelector);
   isAnonymous$ = this.store.select(isAnonymousSelector);
   user$ = this.store.select(userSelector);
+  userUid$ = this.store.select(userUidSelector);
 
   // room
   startGame$ = this.store.select(startGameSelector);
@@ -76,21 +79,13 @@ export class AppComponent implements OnInit {
 
   http = inject(HttpClient);
 
-  animateElement$ = combineLatest([
-    this.animate$,
-    this.foundElement$,
-    this.user$,
-  ]).pipe(
-    filter(([animate, userUid, user]) => {
-      console.log("STAS", { animate, userUid, lol: user.userUid });
-      return userUid !== user.userUid;
-    }),
-    map(([animate]) => animate)
-  );
-
   @HostListener("window:beforeunload")
   beforeUnloadHandler() {
-    this.store.dispatch(playerLeaveRoom());
+    this.userUid$.pipe(take(1)).subscribe((userUid) => {
+      this.store.dispatch(removeRoomUid({ userUid }))
+      this.store.dispatch(updateIsLogin({  userUid, isLogin: false, }));
+      this.store.dispatch(playerLeaveRoom());
+    })
   }
 
   constructor(
@@ -107,6 +102,9 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     const roomUid = window.location.href.split("=")[1];
     this.store.dispatch(getLoginUser({ roomUid }));
+
+    //listen for room removed when host leave a room
+    this.store.dispatch(listenRoomRemoved())
   }
 
   handleFinish() {

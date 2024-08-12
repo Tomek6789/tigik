@@ -11,11 +11,12 @@ import {
   getOpponent,
   opponentStateChangedSuccess,
   signInAsAnonymous,
-  startGameForAnonymous,
-  signForGuest,
+  updateRoomUid,
+  removeRoomUid,
+  updateIsLogin,
 } from "./user.actions";
-import { filter, map, mergeMap, switchMap, tap } from "rxjs/operators";
-import { from, of, pipe } from "rxjs";
+import { map, mergeMap, switchMap, tap } from "rxjs/operators";
+import { from, pipe } from "rxjs";
 import { Injectable } from "@angular/core";
 import { UserService } from "app/services/users.service";
 import { UserCredential } from "@firebase/auth";
@@ -26,7 +27,7 @@ import {
   playerLeaveRoom,
 } from "../room/room.actions";
 import { Action, Store } from "@ngrx/store";
-import { roomUidSelector, userUidSelector } from "./user.selectors";
+import { userUidSelector } from "./user.selectors";
 import { waitForOpponent } from "app/wait-for-actions";
 import { AppState } from "app/app.module";
 import { Test } from "app/services/callable-functions";
@@ -38,13 +39,14 @@ export class UserEffects {
       ofType(getLoginUser),
       switchMap(({ roomUid }) => {
         return this.auth.authStateChanged$.pipe(
-          map((userUid) => ({ userUid, roomUid }))
+          map((userUid) => ({ userUid, roomUid })),
         );
       }),
       mergeMap(({ userUid, roomUid }) => {
         console.log("Auth change", { roomUid, userUid });
         const actions: Action[] = [];
         if (userUid) {
+          // host user
           actions.push(
             userIsLogIn({ userUid }),
             getOpponent(),
@@ -53,11 +55,14 @@ export class UserEffects {
         }
 
         if (roomUid && userUid != null) {
-          actions.push(joinRoom({ roomUid, userUid }), getRoom({ roomUid }));
+          // for opponent when join via link
+          // first getRoom and then join
+          actions.push(joinRoom({ roomUid, userUid }));
         }
 
         if (userUid && roomUid == null) {
-          actions.push(createRoom());
+          // for host always create room
+          actions.push(createRoom({userUid}));
         }
 
         if (userUid == null) {
@@ -132,6 +137,8 @@ export class UserEffects {
     )
   );
 
+  // above are auth effects
+
   getUser$ = createEffect(() =>
     this.actions$.pipe(
       ofType(getUser),
@@ -157,12 +164,37 @@ export class UserEffects {
     )
   );
 
+  updateRoomUid$ = createEffect(() => 
+    this.actions$.pipe(
+    ofType(updateRoomUid),
+    tap(({roomUid, userUid }) => {
+      this.userService.updateRoomUid(userUid, roomUid);
+    }),
+  ), { dispatch: false })
+
+  removeRoomUid$ = createEffect(() => 
+    this.actions$.pipe(
+    ofType(removeRoomUid),
+    tap(({userUid}) => {
+      this.userService.updateRoomUid(userUid, '');
+    }),
+  ), { dispatch: false })
+
+  updateIsLogin$ = createEffect(() => 
+    this.actions$.pipe(
+      ofType(updateIsLogin),
+      tap(({isLogin, userUid}) => 
+        this.userService.updateIsLogin(userUid, isLogin)
+      ),
+    ),
+  { dispatch: false })
+  
+
   constructor(
     private actions$: Actions,
     private store: Store<AppState>,
     private auth: AuthService,
     private userService: UserService,
-    private callableFunctions: Test
   ) {}
 
   private createUser() {

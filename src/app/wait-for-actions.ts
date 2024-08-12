@@ -13,34 +13,31 @@ function createObservable(event: Action, actions: Actions) {
     );
   }
 
-export function waitForActions<T>(
-    events: Action[],
-    actions: Actions
-  ): MonoTypeOperatorFunction<T> {
-    const array = events.map((event) => createObservable(event, actions));
+// export function waitForActions<T>(
+//     events: Action[],
+//     actions: Actions
+//   ): MonoTypeOperatorFunction<T> {
+//     const array = events.map((event) => createObservable(event, actions));
 
-    return pipe(switchMap((action) => zip(...array).pipe(map(() => action))));
-  }
-
-  export function waitForProp<T>(
-    key: string,
-    store: Store<AppState>
-  ): MonoTypeOperatorFunction<T> {
-    const array = store.select(roomUidSelector).pipe(filter((Boolean)), first())
-
-    return pipe(switchMap((action) => zip(array).pipe(map(() => action))));
-  }
+//     return pipe(switchMap((action) => zip(...array).pipe(map(() => action))));
+//   }
 
   export function waitForOpponent(
     store: Store<AppState>
   ) {
     const userUid = store.select(userUidSelector);
-    const opponent = store.select(roomPlayersSelector).pipe(filter((players) => players?.length === 2))
+
+    //because we need to wait for opponent to join the room
+    //when opponent join the room, hostUser is already available
+    const players = store.select(roomPlayersSelector).pipe(filter(players => Boolean(players?.opponentUid)))
 
     return pipe(switchMap(() => 
-      combineLatest([userUid, opponent]).pipe(
+      combineLatest([userUid, players]).pipe(
         map(([userUid, players]) => {        
-          return players.filter(uid => uid !== userUid)[0]
+          const hostUid = players.hostUid;
+          const opponentUid = players.opponentUid;
+
+          return userUid === hostUid ? opponentUid : hostUid;
         
         })
       )
