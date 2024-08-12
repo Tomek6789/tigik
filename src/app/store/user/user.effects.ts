@@ -13,6 +13,7 @@ import {
   signInAsAnonymous,
   updateRoomUid,
   removeRoomUid,
+  updateIsLogin,
 } from "./user.actions";
 import { map, mergeMap, switchMap, tap } from "rxjs/operators";
 import { from, pipe } from "rxjs";
@@ -166,7 +167,7 @@ export class UserEffects {
   updateRoomUid$ = createEffect(() => 
     this.actions$.pipe(
     ofType(updateRoomUid),
-    tap(({roomUid, userUid}) => {
+    tap(({roomUid, userUid }) => {
       this.userService.updateRoomUid(userUid, roomUid);
     }),
   ), { dispatch: false })
@@ -179,12 +180,21 @@ export class UserEffects {
     }),
   ), { dispatch: false })
 
+  updateIsLogin$ = createEffect(() => 
+    this.actions$.pipe(
+      ofType(updateIsLogin),
+      tap(({isLogin, userUid}) => 
+        this.userService.updateIsLogin(userUid, isLogin)
+      ),
+    ),
+  { dispatch: false })
+  
+
   constructor(
     private actions$: Actions,
     private store: Store<AppState>,
     private auth: AuthService,
     private userService: UserService,
-    private callableFunctions: Test
   ) {}
 
   private createUser() {

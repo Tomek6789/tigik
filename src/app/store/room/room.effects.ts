@@ -189,11 +189,6 @@ export class RoomEffects {
           this.store.select(roomPlayersSelector)
         ]),
         tap(([action, userUid, roomUid, players]) => {
-
-
-            this.userService.updateRoomUid(userUid, null);
-            this.userService.updateIsLogin(userUid, false);
-
             if(players.hostUid === userUid) {
               this.roomService.removeRoom(roomUid);
             } else {
@@ -216,13 +211,13 @@ export class RoomEffects {
         this.store.select(userUidSelector),
         this.store.select(isUserLoginSelector),
       ]),
-      filter(([, , isLogin]) =>isLogin),
+      filter(([, , isLogin]) => isLogin ),
       tap(() => {
-        this.snackBarService.openSnackBar('Your opponent left the room, please invite or play individually');
+        this.snackBarService.openSnackBar('Your opponent left the room, we created room for you, please invite someone or play individually');
         this.router.navigate(['/']);
       }),
       mergeMap(([, userUid]) => {
-        return [ createRoom({ userUid})]
+        return [createRoom({ userUid})]
       })
     ),
   )

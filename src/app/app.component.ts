@@ -28,6 +28,9 @@ import {
   signInUser,
   signOutUser,
   signForGuest,
+  userIsLogOut,
+  updateIsLogin,
+  removeRoomUid,
 } from "./store/user/user.actions";
 
 import UserState, { usersFeatureKey } from "./store/user/user.reducer";
@@ -38,6 +41,7 @@ import {
   roomUidSelector,
   showInviteSelector,
   userSelector,
+  userUidSelector,
 } from "./store/user/user.selectors";
 import {
   animateElementSelector,
@@ -64,6 +68,7 @@ export class AppComponent implements OnInit {
   isLogin$ = this.store.select(isUserLoginSelector);
   isAnonymous$ = this.store.select(isAnonymousSelector);
   user$ = this.store.select(userSelector);
+  userUid$ = this.store.select(userUidSelector);
 
   // room
   startGame$ = this.store.select(startGameSelector);
@@ -76,7 +81,11 @@ export class AppComponent implements OnInit {
 
   @HostListener("window:beforeunload")
   beforeUnloadHandler() {
-    this.store.dispatch(playerLeaveRoom());
+    this.userUid$.pipe(take(1)).subscribe((userUid) => {
+      this.store.dispatch(removeRoomUid({ userUid }))
+      this.store.dispatch(updateIsLogin({  userUid, isLogin: false, }));
+      this.store.dispatch(playerLeaveRoom());
+    })
   }
 
   constructor(

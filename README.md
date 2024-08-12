@@ -28,3 +28,6 @@ https://excalidraw.com/#json=uLxO1Rw0MmzK_jvPj5jKu,0K7oBqb-oRfKNWdmT1yulw
 
 Old tests:
 https://github.com/Tomek6789/tigik/blob/rxjs-testing/src/app/app.state.spec.ts
+
+PORTS:
+https://stackoverflow.com/questions/39632667/how-can-i-close-some-specific-port-on-linux

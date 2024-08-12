@@ -70,6 +70,11 @@ export const removeRoomUid = createAction(
     props<{ userUid: string }>()
 )
 
+export const updateIsLogin = createAction(
+    '[User] updateIsLogin',
+    props<{ isLogin: boolean, userUid: string }>()
+)
+
 // export const inviteOpponent = createAction(
 //     '[Opponent] inviteOpponent',
 //     props<{ roomUid: string }>()
