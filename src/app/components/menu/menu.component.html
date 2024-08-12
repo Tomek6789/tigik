@@ -1,5 +1,4 @@
 <div class="menu">
-
    <button *ngIf="!isLogin" mat-raised-button color="primary" (click)="onSignIn()"> 
     <mat-icon>login</mat-icon>
     Sign In
@@ -10,20 +9,18 @@
     Start Game
   </button>
   
-  
   <button *ngIf="showInvite else opponent" mat-raised-button color="primary" (click)="onInvite()"> 
     <mat-icon>share</mat-icon>
     Invite
   </button>
-  
 </div>
 
 
 <ng-template #showElement>
-  <div class="find">{{ searchingElement }}</div>
+  <div *ngIf="searchingElement" class="find">{{ searchingElement }}</div>
+  <div *ngIf="!searchingElement" class="box"></div>
 </ng-template>
 
 <ng-template #opponent>
   <ng-content select=[opponentUser]></ng-content>
-
 </ng-template>
