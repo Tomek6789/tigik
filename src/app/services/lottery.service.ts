@@ -1,11 +1,10 @@
 import { Injectable } from "@angular/core";
 
-const Test = {
-  One: ["K", "Na", "Ca"],
-  Two: ["Al", "Zn", "Co"],
-  Three: ["H", "O"],
-  Four: ["N", "C"],
-  Five: ["Si", "O"],
+const LEVELS = {
+  One: ["H", "He", "Li", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar", "K", "Ca", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn",  "Ag",  "Au", "Hg",  "Pb"],
+  Two: ["Be", "Sc", "Ti", "V", "Ga", "Ge", "As", "Se", "Br", "Kr", "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Cd", "In", "Sn", "Sb", "Te", "I", "Xe", "Cs", "Ba"],
+  Three: ["Bi", "Po", "La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu", "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Tl", "At", "Rn", "Fr", "Ra", "Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr"],
+  Four: ["Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn", "Nh", "Fl", "Mc", "Lv", "Ts", "Og"],
 };
 
 @Injectable({
@@ -13,34 +12,38 @@ const Test = {
 })
 export class LotteryService {
   public element = "Na";
-  previuosElement = null
+  previousElement = null
 
   private table = [];
   drawElement(score: number) {
-    this.table = this.table.concat(Test[this.currentLevel(score)]);
-    
-    let currentElement = null;
-    currentElement = this.findElement();
-    while(this.previuosElement === currentElement) {
-      currentElement = this.findElement()
-    } 
-    this.previuosElement = currentElement
-    return currentElement;
+    this.updateTable(score);
+    let newElement = this.getUniqueElement();
+    this.previousElement = newElement;
+    return newElement;
+}
+
+  private updateTable(score: number) {
+    this.table = this.table.concat(LEVELS[this.currentLevel(score)]);
   }
 
+  private getUniqueElement() {
+    let element = this.findElement();
+    while (this.previousElement === element) {
+        element = this.findElement();
+    }
+    return element
+  }
 
   public currentLevel(score: number): string {
     switch (true) {
-      case score <= 20:
-        return "One";
-      case score <= 30:
-        return "Two";
-      case score <= 50:
-        return "Three";
       case score <= 60:
+        return "One";
+      case score <= 90:
+        return "Two";
+      case score <= 120:
+        return "Three";
+      case score <= 150:
         return "Four";
-      case score <= 70:
-        return "Five";
       default:
         return "One";
     }

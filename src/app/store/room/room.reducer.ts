@@ -13,6 +13,10 @@ export interface RoomState {
   searchingElement?: string;
   animate?: string;
   foundElement?: string;
+  winnerUid?: string;
+  // this is for multiplayer mode
+  // after 3 attempts, the game will be over
+  attempt?: number;
 }
 
 export type Players = RoomState['players']; 

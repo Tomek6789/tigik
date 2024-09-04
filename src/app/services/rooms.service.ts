@@ -47,6 +47,7 @@ export class RoomsService {
         players: { hostUid },
         startGame: false,
         searchingElement: null,
+        attempt: 0,
       });
   }
 
@@ -67,31 +68,41 @@ export class RoomsService {
   }
 
 
-  async startGame(roomUid: string, status: boolean, element: string) {
+  async startGame(roomUid: string, status: boolean) {
     if(roomUid === null) return
 
     const room = ref(this.db, ('rooms/' + roomUid))
     this.roomUid.next(roomUid)
     return update(room, {
       startGame: status,
-      searchingElement: element,
     });
   }
 
   searchingElement(roomUid: string, element: string) {
     const room = ref(this.db, ('rooms/' + roomUid))
-    update(room, { searchingElement: element });
+    update(room, { searchingElement: element, animate: null });
   }
 
-  animate(roomUid: string, element: string, userUid: string) {
+  animate(roomUid: string, element: string) {
     const room = ref(this.db, ('rooms/' + roomUid))
     update(room, { animate: element, searchingElement: null })
+  }
+
+  winnerUid(roomUid: string, userUid: string) {
+    const room = ref(this.db, ('rooms/' + roomUid))
+    update(room, { winnerUid: userUid, animate: null })
   }
 
   clearAnimate(roomUid: string) {
     if(roomUid === null) return
 
     const room = ref(this.db, ('rooms/' + roomUid))
-    update(room, { animate: null, })  }
+    update(room, { animate: null, })  
+  }
 
+  setAttempt(roomUid: string, attempt: number) {
+    if( roomUid === null) return
+    const room = ref(this.db, ('rooms/' + roomUid))
+    update(room, { attempt: attempt + 1 })
+  }
 }

@@ -42,7 +42,7 @@ import {
 import { Test } from "app/services/callable-functions";
 import { SnackBarService } from "app/services/snackbar.service";
 import { Router } from "@angular/router";
-import { roomPlayersSelector } from "./room.selectors";
+import { attemptSelector, isSinglePlayerModeSelector, roomPlayersSelector, searchingElementSelector } from "./room.selectors";
 
 @Injectable({ providedIn: "root" })
 export class RoomEffects {
@@ -121,9 +121,14 @@ export class RoomEffects {
       ]),
       switchMap(([action, roomUid, score, isLogin]) => {
         if (isLogin) {
-          return from(
-            this.roomService.startGame(roomUid, true, this.randomElement(score))
-          ).pipe(map(() => startGameSuccess()));
+          return of('start game').pipe(
+            tap(() => {
+              this.roomService.startGame(roomUid, true)
+              this.roomService.winnerUid(roomUid, null)
+              this.roomService.searchingElement(roomUid, this.randomElement(score))
+            }),
+            map(() => startGameSuccess())
+          )
         } else {
           return of(signInAsAnonymous());
         }
@@ -131,6 +136,7 @@ export class RoomEffects {
     )
   );
 
+  
   selectedElement$ = createEffect(
     () =>
       this.actions$.pipe(
@@ -139,19 +145,28 @@ export class RoomEffects {
           this.store.select(userUidSelector),
           this.store.select(roomUidSelector),
           this.store.select(scoreSelector),
+          this.store.select(isSinglePlayerModeSelector),
         ]),
-        tap(([action, userUid, roomUid, score]) => {
-          this.roomService.animate(roomUid, action.selectedElement, userUid);
+        tap(([action, userUid, roomUid, score, isSinglePlayerMode]) => {
+          let test 
+          this.roomService.animate(roomUid, action.selectedElement);
 
-          setTimeout(() => {
-            this.roomService.searchingElement(
+          test = setTimeout(() => {
+             this.roomService.searchingElement(
               roomUid,
               this.randomElement(score)
             );
           }, 800);
 
           this.userService.updateScore(userUid, score + 10);
-          return startGameSuccess();
+
+          if(!isSinglePlayerMode && score === 70) {
+            clearTimeout(test);
+            this.roomService.winnerUid(roomUid, userUid);
+            this.roomService.startGame(roomUid, false);
+            this.roomService.clearAnimate(roomUid);
+            this.userService.updateScore(userUid, 0);
+          }
         })
       ),
     { dispatch: false }
@@ -166,14 +181,36 @@ export class RoomEffects {
           this.store.select(roomUidSelector),
           this.store.select(scoreSelector),
           this.store.select(bestScoreSelector),
+          this.store.select(searchingElementSelector),
+          this.store.select(isSinglePlayerModeSelector),
+          this.store.select(attemptSelector),
         ]),
-        tap(([action, userUid, roomUid, score, bestScore]) => {
+        tap(([action, userUid, roomUid, score, bestScore, selectedElement, isSinglePlayerMode, attempt]) => {
           if (score > bestScore) {
             this.userService.updateBestScore(userUid, score);
           }
-          this.roomService.startGame(roomUid, false, null);
-          this.roomService.clearAnimate(roomUid);
-          this.userService.updateScore(userUid, 0);
+          if(!isSinglePlayerMode && attempt < 1) {
+            this.roomService.animate(roomUid, selectedElement);
+            this.roomService.setAttempt(roomUid, attempt);
+
+            setTimeout(() => {
+              this.roomService.searchingElement(
+               roomUid,
+               this.randomElement(score)
+             );
+           }, 800);
+          } else {
+
+            this.roomService.startGame(roomUid, false);
+            this.roomService.setAttempt(roomUid, 0);
+            this.userService.updateScore(userUid, 0);
+            this.roomService.animate(roomUid, selectedElement);
+            setTimeout(() => {
+              this.roomService.clearAnimate(
+               roomUid,
+             );
+           }, 800);
+          }
         })
       ),
     { dispatch: false }

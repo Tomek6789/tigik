@@ -31,3 +31,6 @@ https://github.com/Tomek6789/tigik/blob/rxjs-testing/src/app/app.state.spec.ts
 
 PORTS:
 https://stackoverflow.com/questions/39632667/how-can-i-close-some-specific-port-on-linux
+
+
+1. Multiplater after 3 tries should finish game.

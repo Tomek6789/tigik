@@ -5,9 +5,9 @@
     [matRippleCentered]="true"
     [@tada]="element.animate"
     class="border box {{ 'element-' + element.symbol }}"
-    [class.color]="element.animate && !searchingElement"
+    [class.tada]="element.animate"
     (click)="handleSelected(element)"
-  >
+    >
     {{ element.symbol }}
   </div>
 </div>

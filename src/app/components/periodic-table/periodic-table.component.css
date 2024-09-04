@@ -9,6 +9,10 @@
   background-color: #e93838 !important;
 }
 
+.tada {
+  background-color: #FCC585 !important;
+}
+
 .find {
   grid-column: 7/10;
   grid-row: 1/3;
