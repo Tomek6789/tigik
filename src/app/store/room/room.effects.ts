@@ -47,7 +47,7 @@ import { attemptSelector, isSinglePlayerModeSelector, roomPlayersSelector, searc
 @Injectable({ providedIn: "root" })
 export class RoomEffects {
   getRoom$ = createEffect(() =>
-    this.actions$.pipe(
+    { return this.actions$.pipe(
       ofType(getRoom),
       switchMap(({ roomUid }) => {
         return this.callableFunctions
@@ -67,11 +67,11 @@ export class RoomEffects {
             })
           );
       })
-    )
+    ) }
   );
 
   createRoom$ = createEffect(() =>
-    this.actions$.pipe(
+    { return this.actions$.pipe(
       ofType(createRoom),
       switchMap(({userUid}) => {
         let roomUid: string;
@@ -82,11 +82,11 @@ export class RoomEffects {
         ).pipe(map(() => ({ roomUid, userUid })));
       }),
       mergeMap(({ userUid, roomUid }) => [getRoom({ roomUid }), updateRoomUid({ userUid, roomUid}), createRoomSuccess()])
-    )
+    ) }
   );
 
   joinRoom$ = createEffect(() =>
-    this.actions$.pipe(
+    { return this.actions$.pipe(
       ofType(joinRoom),
       switchMap(({ roomUid, userUid }) => {
         return this.callableFunctions
@@ -108,11 +108,11 @@ export class RoomEffects {
             })
           )
         })
-      )
+      ) }
     );
 
   startGame$ = createEffect(() =>
-    this.actions$.pipe(
+    { return this.actions$.pipe(
       ofType(startGame),
       concatLatestFrom(() => [
         this.store.select(roomUidSelector),
@@ -133,13 +133,13 @@ export class RoomEffects {
           return of(signInAsAnonymous());
         }
       })
-    )
+    ) }
   );
 
   
   selectedElement$ = createEffect(
     () =>
-      this.actions$.pipe(
+      { return this.actions$.pipe(
         ofType(selectedElement),
         concatLatestFrom(() => [
           this.store.select(userUidSelector),
@@ -168,13 +168,13 @@ export class RoomEffects {
             this.userService.updateScore(userUid, 0);
           }
         })
-      ),
+      ) },
     { dispatch: false }
   );
 
   finishGame$ = createEffect(
     () =>
-      this.actions$.pipe(
+      { return this.actions$.pipe(
         ofType(finishGame),
         concatLatestFrom(() => [
           this.store.select(userUidSelector),
@@ -212,13 +212,13 @@ export class RoomEffects {
            }, 800);
           }
         })
-      ),
+      ) },
     { dispatch: false }
   );
 
   playerLeaveRoom$ = createEffect(
     () =>
-      this.actions$.pipe(
+      { return this.actions$.pipe(
         ofType(playerLeaveRoom),
         concatLatestFrom(() => [
           this.store.select(userUidSelector),
@@ -232,14 +232,14 @@ export class RoomEffects {
               this.roomService.removeOpponentFromRoom(roomUid, {hostUid: players.hostUid, opponentUid: null})
             }
         })
-      ),
+      ) },
     { dispatch: false }
   );
 
 
   // when host leave room
   removedRoom$ = createEffect(() => 
-    this.actions$.pipe(
+    { return this.actions$.pipe(
       ofType(listenRoomRemoved),
       switchMap(() => {
         return this.roomService.roomRemoved$;
@@ -256,7 +256,7 @@ export class RoomEffects {
       mergeMap(([, userUid]) => {
         return [createRoom({ userUid})]
       })
-    ),
+    ) },
   )
 
   constructor(

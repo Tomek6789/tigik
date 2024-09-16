@@ -29,3 +29,7 @@ https://github.com/Tomek6789/tigik/blob/rxjs-testing/src/app/app.state.spec.ts
 
 PORTS:
 https://stackoverflow.com/questions/39632667/how-can-i-close-some-specific-port-on-linux
+
+PROD RELEASE:
+
+1. npm rub build --prod

@@ -33,7 +33,7 @@ import { AppState } from "app/app.module";
 @Injectable({ providedIn: "root" })
 export class UserEffects {
   getLoginUser$ = createEffect(() =>
-    this.actions$.pipe(
+    { return this.actions$.pipe(
       ofType(getLoginUser),
       switchMap(({ roomUid }) => {
         return this.auth.authStateChanged$.pipe(
@@ -73,57 +73,57 @@ export class UserEffects {
 
         return actions;
       })
-    )
+    ) }
   );
 
   signIn$ = createEffect(
     () =>
-      this.actions$.pipe(
+      { return this.actions$.pipe(
         ofType(signInUser),
         switchMap(() => {
           return from(this.auth.googleSignIn());
         }),
         this.createUser()
-      ),
+      ) },
     { dispatch: false }
   );
 
   signInAsAnonymous$ = createEffect(
     () =>
-      this.actions$.pipe(
+      { return this.actions$.pipe(
         ofType(signInAsAnonymous),
         switchMap(() => {
           return from(this.auth.anonymous());
         }),
         this.createUser()
-      ),
+      ) },
     { dispatch: false }
   );
 
   signOut$ = createEffect(
     () =>
-      this.actions$.pipe(
+      { return this.actions$.pipe(
         ofType(signOutUser),
         tap(() => {
           this.auth.signOut();
         })
-      ),
+      ) },
     { dispatch: false }
   );
 
   logIn$ = createEffect(
     () =>
-      this.actions$.pipe(
+      { return this.actions$.pipe(
         ofType(userIsLogIn),
         tap(({ userUid }) => {
           this.userService.updateIsLogin(userUid, true);
         })
-      ),
+      ) },
     { dispatch: false }
   );
 
   logOut$ = createEffect(() =>
-    this.actions$.pipe(
+    { return this.actions$.pipe(
       ofType(userIsLogOut),
       concatLatestFrom(() => [this.store.select(userUidSelector)]),
       tap(([action, userUid]) => {
@@ -132,13 +132,13 @@ export class UserEffects {
       map(() => {
         return playerLeaveRoom();
       })
-    )
+    ) }
   );
 
   // above are auth effects
 
   getUser$ = createEffect(() =>
-    this.actions$.pipe(
+    { return this.actions$.pipe(
       ofType(getUser),
       switchMap(({ userUid }) => {
         return this.userService.onUserStateChanged(userUid);
@@ -146,11 +146,11 @@ export class UserEffects {
       map((user) => {
         return userStateChangedSuccess({ user });
       })
-    )
+    ) }
   );
 
   getOpponent$ = createEffect(() =>
-    this.actions$.pipe(
+    { return this.actions$.pipe(
       ofType(getOpponent),
       waitForOpponent(this.store),
       switchMap((opponentUid) => {
@@ -159,32 +159,32 @@ export class UserEffects {
       map((opponent) => {
         return opponentStateChangedSuccess({ opponent });
       })
-    )
+    ) }
   );
 
   updateRoomUid$ = createEffect(() => 
-    this.actions$.pipe(
+    { return this.actions$.pipe(
     ofType(updateRoomUid),
     tap(({roomUid, userUid }) => {
       this.userService.updateRoomUid(userUid, roomUid);
     }),
-  ), { dispatch: false })
+  ) }, { dispatch: false })
 
   removeRoomUid$ = createEffect(() => 
-    this.actions$.pipe(
+    { return this.actions$.pipe(
     ofType(removeRoomUid),
     tap(({userUid}) => {
       this.userService.updateRoomUid(userUid, '');
     }),
-  ), { dispatch: false })
+  ) }, { dispatch: false })
 
   updateIsLogin$ = createEffect(() => 
-    this.actions$.pipe(
+    { return this.actions$.pipe(
       ofType(updateIsLogin),
       tap(({isLogin, userUid}) => 
         this.userService.updateIsLogin(userUid, isLogin)
       ),
-    ),
+    ) },
   { dispatch: false })
   
 

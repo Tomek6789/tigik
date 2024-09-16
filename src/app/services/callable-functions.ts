@@ -6,7 +6,7 @@ export class Test {
 
     checkRoomExists() {
         const functions = getFunctions();
-        connectFunctionsEmulator(functions, 'localhost', 5001);
+        // connectFunctionsEmulator(functions, 'localhost', 5001);
     
 
         return httpsCallableData<{roomUid: string}, string>(functions, 'checkRoomExists');
