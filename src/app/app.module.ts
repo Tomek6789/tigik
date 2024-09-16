@@ -1,11 +1,6 @@
 import { ClipboardModule } from "@angular/cdk/clipboard";
 import { HttpClientModule } from "@angular/common/http";
 import { NgModule, isDevMode } from "@angular/core";
-// import { AngularFireModule,  } from "@angular/fire";
-// import { AngularFireAuthModule } from "@angular/fire/auth";
-// import { AngularFireDatabaseModule } from "@angular/fire/database";
-// import { AngularFirestoreModule } from "@angular/fire/firestore";
-
 import { provideFirebaseApp, getApp, initializeApp } from "@angular/fire/app";
 import { getFirestore, provideFirestore } from "@angular/fire/firestore";
 
@@ -71,17 +66,17 @@ export interface AppState {
     provideFirestore(() => getFirestore()),
     provideDatabase(() => {
       const database = getDatabase();
-      connectDatabaseEmulator(database, "localhost", 9000);
+      // connectDatabaseEmulator(database, "localhost", 9000);
       return database;
     }),
     provideAuth(() => {
       const auth = getAuth();
-      connectAuthEmulator(auth, "http://127.0.0.1:9099");
+      // connectAuthEmulator(auth, "http://127.0.0.1:9099");
       return auth;
     }),
     provideFunctions(() => {
       const functions = getFunctions(getApp());
-      connectFunctionsEmulator(functions, "127.0.0.1", 5001);
+      // connectFunctionsEmulator(functions, "127.0.0.1", 5001);
       return functions;
     }),
 
