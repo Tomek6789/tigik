@@ -1,7 +1,9 @@
 
-        <app-progress-bar (finish)="handleFinish($event)"
-        [reset$]="searchingElementChanged$">
-
+        <app-progress-bar 
+            [singlePlayerMode$]="isSinglePlayerMode$"
+            [reset$]="resetProgressBar$"
+            (finish)="handleFinish($event)"
+        >
         </app-progress-bar>
         <app-menu 
             [isStartGame]="startGame$ | async" 
@@ -12,16 +14,19 @@
             (signIn)="onSingIn()" 
             (invite)="onInvitePlayer()">
 
-            <app-profile loggedUser *ngIf="isLogin$ | async"  
-            
+            <app-profile loggedUser *ngIf="isLogin$ | async"
+                [winnerUid]="winnerUid$ | async"
                 [user]="user$ | async" 
                 (signOut)="onSignOut()">
             </app-profile>
-            <app-profile opponentUser [showLogout]="false" [user]="opponentPlayer$ | async"></app-profile>
+            <app-profile opponentUser [winnerUid]="winnerUid$ | async" [showLogout]="false" [user]="opponentPlayer$ | async"></app-profile>
 
         </app-menu>
 
-        <app-periodic-table [table]="table$ | async"             [searchingElement]="searchingElementChanged$ | async"
+        <app-periodic-table 
+            [isStartGame]="startGame$ | async" 
+            [table]="table$ | async"
+            [searchingElement]="searchingElementChanged$ | async"
             [animate]="animate$ | async"
             (selected)="handleSelected($event)"></app-periodic-table>
 

@@ -11,6 +11,7 @@ import { User } from 'app/auth/user.model';
 export class ProfileComponent  {
 
     @Input() user: User;
+    @Input() winnerUid: string;
     @Input() showLogout: boolean = true
     @Output() signOut = new EventEmitter();
 

@@ -8,7 +8,6 @@ img {
 .flex {
     display: flex;
     align-items: center;
-    
 }
 .column {
     flex-direction: column;
@@ -19,4 +18,14 @@ img {
     height: 40px;
     width: 40px;
     font-size: 40px
+}
+
+.winner {
+    width: 100px;
+    height: 24px;
+    border-radius: 2px;
+}
+
+.party { 
+    font-size: 26px
 }

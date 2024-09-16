@@ -45,8 +45,11 @@ import {
 } from "./store/user/user.selectors";
 import {
   animateElementSelector,
+  isSinglePlayerModeSelector,
+  resetProgressBarSelector,
   searchingElementSelector,
   startGameSelector,
+  winnerUidSelector,
 } from "./store/room/room.selectors";
 
 import { HttpClient } from "@angular/common/http";
@@ -73,9 +76,12 @@ export class AppComponent implements OnInit {
   // room
   startGame$ = this.store.select(startGameSelector);
   searchingElementChanged$ = this.store.select(searchingElementSelector);
+  resetProgressBar$ = this.store.select(resetProgressBarSelector);
   opponentPlayer$ = this.store.select(opponentSelector);
   showInvite$ = this.store.select(showInviteSelector);
   roomUid$ = this.store.select(roomUidSelector);
+  winnerUid$ = this.store.select(winnerUidSelector);
+  isSinglePlayerMode$ = this.store.select(isSinglePlayerModeSelector);
 
   http = inject(HttpClient);
 

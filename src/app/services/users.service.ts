@@ -51,6 +51,8 @@ export class UserService {
   }
 
   updateRoomUid(userUid: string, roomUid: string) {
+    if(userUid == null) return
+
     const user = ref(this.db, ('users/' + userUid))
     
     return update(user, {  roomUid  })

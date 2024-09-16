@@ -13,7 +13,6 @@ export class PeriodicTableService {
       .get<Element[]>("../assets/periodicTable.json")
       .pipe(
         map((elements) => (elements.map((element) => ({ ...element, animate: false })))),
-        tap(console.log),
         catchError((error: any) => Observable.throw(error)));
   }
 }

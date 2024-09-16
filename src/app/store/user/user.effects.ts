@@ -22,7 +22,6 @@ import { UserService } from "app/services/users.service";
 import { UserCredential } from "@firebase/auth";
 import {
   createRoom,
-  getRoom,
   joinRoom,
   playerLeaveRoom,
 } from "../room/room.actions";
@@ -30,7 +29,6 @@ import { Action, Store } from "@ngrx/store";
 import { userUidSelector } from "./user.selectors";
 import { waitForOpponent } from "app/wait-for-actions";
 import { AppState } from "app/app.module";
-import { Test } from "app/services/callable-functions";
 
 @Injectable({ providedIn: "root" })
 export class UserEffects {

@@ -14,11 +14,17 @@ export class PeriodicTableComponent implements OnChanges {
   @Input() table: Element[];
   @Input() searchingElement: string;
   @Input() animate: string;
+  @Input() isStartGame: boolean;
 
   @Output() selected: EventEmitter<string> = new EventEmitter();
 
   ngOnChanges() {
-    if(this.animate) {
+    console.log('searchingElement',this.searchingElement)
+    console.log('animate', this.animate)
+    console.log('isStartGame', this.isStartGame)
+    console.log('--------------')
+
+    if(this.animate || this.animate === undefined) {
 
       this.table.forEach((element) => {
         if(element.symbol === this.animate) {          
@@ -30,14 +36,17 @@ export class PeriodicTableComponent implements OnChanges {
         }
       })
     }
+
+    if(!this.isStartGame) {
+      this.table.forEach((element) => {
+        element.animate = false
+      })
+    }
   }
 
   handleSelected(element: Element) {
 
-    if(element.symbol === this.searchingElement) {
-
-      // this.animate(element)
-      
+    if(element.symbol === this.searchingElement) {      
       this.selected.emit(element.symbol);
     }
   }
