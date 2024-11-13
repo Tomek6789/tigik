@@ -20,11 +20,7 @@ import { from, pipe } from "rxjs";
 import { Injectable } from "@angular/core";
 import { UserService } from "app/services/users.service";
 import { UserCredential } from "@firebase/auth";
-import {
-  createRoom,
-  joinRoom,
-  playerLeaveRoom,
-} from "../room/room.actions";
+import { createRoom, joinRoom, playerLeaveRoom } from "../room/room.actions";
 import { Action, Store } from "@ngrx/store";
 import { userUidSelector } from "./user.selectors";
 import { waitForOpponent } from "app/wait-for-actions";
@@ -32,16 +28,15 @@ import { AppState } from "app/app.module";
 
 @Injectable({ providedIn: "root" })
 export class UserEffects {
-  getLoginUser$ = createEffect(() =>
-    { return this.actions$.pipe(
+  getLoginUser$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(getLoginUser),
       switchMap(({ roomUid }) => {
         return this.auth.authStateChanged$.pipe(
-          map((userUid) => ({ userUid, roomUid })),
+          map((userUid) => ({ userUid, roomUid }))
         );
       }),
       mergeMap(({ userUid, roomUid }) => {
-        console.log("Auth change", { roomUid, userUid });
         const actions: Action[] = [];
         if (userUid) {
           // host user
@@ -60,7 +55,7 @@ export class UserEffects {
 
         if (userUid && roomUid == null) {
           // for host always create room
-          actions.push(createRoom({userUid}));
+          actions.push(createRoom({ userUid }));
         }
 
         if (userUid == null) {
@@ -73,57 +68,61 @@ export class UserEffects {
 
         return actions;
       })
-    ) }
-  );
+    );
+  });
 
   signIn$ = createEffect(
-    () =>
-      { return this.actions$.pipe(
+    () => {
+      return this.actions$.pipe(
         ofType(signInUser),
         switchMap(() => {
           return from(this.auth.googleSignIn());
         }),
         this.createUser()
-      ) },
+      );
+    },
     { dispatch: false }
   );
 
   signInAsAnonymous$ = createEffect(
-    () =>
-      { return this.actions$.pipe(
+    () => {
+      return this.actions$.pipe(
         ofType(signInAsAnonymous),
         switchMap(() => {
           return from(this.auth.anonymous());
         }),
         this.createUser()
-      ) },
+      );
+    },
     { dispatch: false }
   );
 
   signOut$ = createEffect(
-    () =>
-      { return this.actions$.pipe(
+    () => {
+      return this.actions$.pipe(
         ofType(signOutUser),
         tap(() => {
           this.auth.signOut();
         })
-      ) },
+      );
+    },
     { dispatch: false }
   );
 
   logIn$ = createEffect(
-    () =>
-      { return this.actions$.pipe(
+    () => {
+      return this.actions$.pipe(
         ofType(userIsLogIn),
         tap(({ userUid }) => {
           this.userService.updateIsLogin(userUid, true);
         })
-      ) },
+      );
+    },
     { dispatch: false }
   );
 
-  logOut$ = createEffect(() =>
-    { return this.actions$.pipe(
+  logOut$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(userIsLogOut),
       concatLatestFrom(() => [this.store.select(userUidSelector)]),
       tap(([action, userUid]) => {
@@ -132,13 +131,13 @@ export class UserEffects {
       map(() => {
         return playerLeaveRoom();
       })
-    ) }
-  );
+    );
+  });
 
   // above are auth effects
 
-  getUser$ = createEffect(() =>
-    { return this.actions$.pipe(
+  getUser$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(getUser),
       switchMap(({ userUid }) => {
         return this.userService.onUserStateChanged(userUid);
@@ -146,11 +145,11 @@ export class UserEffects {
       map((user) => {
         return userStateChangedSuccess({ user });
       })
-    ) }
-  );
+    );
+  });
 
-  getOpponent$ = createEffect(() =>
-    { return this.actions$.pipe(
+  getOpponent$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(getOpponent),
       waitForOpponent(this.store),
       switchMap((opponentUid) => {
@@ -159,40 +158,50 @@ export class UserEffects {
       map((opponent) => {
         return opponentStateChangedSuccess({ opponent });
       })
-    ) }
+    );
+  });
+
+  updateRoomUid$ = createEffect(
+    () => {
+      return this.actions$.pipe(
+        ofType(updateRoomUid),
+        tap(({ roomUid, userUid }) => {
+          this.userService.updateRoomUid(userUid, roomUid);
+        })
+      );
+    },
+    { dispatch: false }
   );
 
-  updateRoomUid$ = createEffect(() => 
-    { return this.actions$.pipe(
-    ofType(updateRoomUid),
-    tap(({roomUid, userUid }) => {
-      this.userService.updateRoomUid(userUid, roomUid);
-    }),
-  ) }, { dispatch: false })
+  removeRoomUid$ = createEffect(
+    () => {
+      return this.actions$.pipe(
+        ofType(removeRoomUid),
+        tap(({ userUid }) => {
+          this.userService.updateRoomUid(userUid, "");
+        })
+      );
+    },
+    { dispatch: false }
+  );
 
-  removeRoomUid$ = createEffect(() => 
-    { return this.actions$.pipe(
-    ofType(removeRoomUid),
-    tap(({userUid}) => {
-      this.userService.updateRoomUid(userUid, '');
-    }),
-  ) }, { dispatch: false })
-
-  updateIsLogin$ = createEffect(() => 
-    { return this.actions$.pipe(
-      ofType(updateIsLogin),
-      tap(({isLogin, userUid}) => 
-        this.userService.updateIsLogin(userUid, isLogin)
-      ),
-    ) },
-  { dispatch: false })
-  
+  updateIsLogin$ = createEffect(
+    () => {
+      return this.actions$.pipe(
+        ofType(updateIsLogin),
+        tap(({ isLogin, userUid }) =>
+          this.userService.updateIsLogin(userUid, isLogin)
+        )
+      );
+    },
+    { dispatch: false }
+  );
 
   constructor(
     private actions$: Actions,
     private store: Store<AppState>,
     private auth: AuthService,
-    private userService: UserService,
+    private userService: UserService
   ) {}
 
   private createUser() {
@@ -204,7 +213,6 @@ export class UserEffects {
         ({
           user: { displayName, photoURL, uid, isAnonymous },
         }: UserCredential) => {
-          console.log(isAnonymous);
           return from(
             //createUser in my user database,
             this.userService.createUser({
