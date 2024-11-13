@@ -9,7 +9,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "firebase:release": "firebase deploy",
+    "firebase": "firebase",
+    "firebase:release": "npm run build -- -c production && firebase deploy",
     "firebase:backend": "firebase emulators:start",
     "build-cypress": "./node_modules/.bin/webpack --output-filename out.js --entry ./cypress/integration/super.spec.ts"
   },
