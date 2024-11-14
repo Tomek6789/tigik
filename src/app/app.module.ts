@@ -70,7 +70,7 @@ export interface AppState {
     }),
     provideAuth(() => {
       const auth = getAuth();
-      // connectAuthEmulator(auth, "http://127.0.0.1:9099");
+      connectAuthEmulator(auth, "http://127.0.0.1:9099");
       return auth;
     }),
     provideFunctions(() => {
