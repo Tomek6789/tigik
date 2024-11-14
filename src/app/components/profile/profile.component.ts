@@ -1,23 +1,26 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { User } from 'app/auth/user.model';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+} from "@angular/core";
+import { User } from "app/auth/user.model";
 
 @Component({
-    selector: 'app-profile',
-    styleUrls: ['profile.component.css'],
-    templateUrl: 'profile.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+  selector: "app-profile",
+  styleUrls: ["profile.component.css"],
+  templateUrl: "profile.component.html",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
+export class ProfileComponent {
+  @Input() user: User;
+  @Input() winnerUid: string;
+  @Input() showLogout: boolean = true;
+  @Output() signOut = new EventEmitter();
 
-export class ProfileComponent  {
-
-    @Input() user: User;
-    @Input() winnerUid: string;
-    @Input() showLogout: boolean = true
-    @Output() signOut = new EventEmitter();
-
-    onSignOut() {
-        console.log('aaaaatest'),
-        this.signOut.emit()
-    }
-
+  onSignOut() {
+    this.signOut.emit();
+  }
 }

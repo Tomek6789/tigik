@@ -1,3 +1,8 @@
+.game {
+  width: 100%;
+  height: 100%;
+}
+/* 
 .players {
   display: flex;
   justify-content: space-evenly;
@@ -12,9 +17,9 @@ p {
   font-size: 20px;
   margin-left: 2%;
   font-weight: bold;
-}
+} */
 
-@media (max-width: 1200px) {
+/* @media (max-width: 1200px) {
   .find {
     font-size: 30px;
   }
@@ -36,4 +41,4 @@ p {
   button {
     padding: 0;
   }
-}
+} */

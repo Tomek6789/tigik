@@ -1,18 +1,14 @@
 import { Clipboard } from "@angular/cdk/clipboard";
-import { Component, HostListener, inject, OnInit } from "@angular/core";
-import { ActivatedRoute, Router, UrlSerializer } from "@angular/router";
-import { Store } from "@ngrx/store";
-import { combineLatest, Subject, from, iif } from "rxjs";
 import {
-  filter,
-  map,
-  pluck,
-  startWith,
-  switchMap,
-  take,
-  tap,
-  withLatestFrom,
-} from "rxjs/operators";
+  Component,
+  HostListener,
+  inject,
+  OnInit,
+  ViewChild,
+} from "@angular/core";
+import { Router, UrlSerializer } from "@angular/router";
+import { Store } from "@ngrx/store";
+import { take, tap } from "rxjs/operators";
 import { SnackBarService } from "./services/snackbar.service";
 import { UserService } from "./services/users.service";
 import {
@@ -54,6 +50,10 @@ import {
 
 import { HttpClient } from "@angular/common/http";
 import { PeriodicTableService } from "./services/periodic-table.service";
+import { Overlay, OverlayConfig, OverlayContainer } from "@angular/cdk/overlay";
+import { CdkPortal, ComponentPortal } from "@angular/cdk/portal";
+import { UserProfileComponent } from "./auth/user-profile/user-profile.component";
+import { MenuComponent } from "./components/menu/menu.component";
 
 interface State {
   [usersFeatureKey]: UserState;
@@ -88,10 +88,10 @@ export class AppComponent implements OnInit {
   @HostListener("window:beforeunload")
   beforeUnloadHandler() {
     this.userUid$.pipe(take(1)).subscribe((userUid) => {
-      this.store.dispatch(removeRoomUid({ userUid }))
-      this.store.dispatch(updateIsLogin({  userUid, isLogin: false, }));
+      this.store.dispatch(removeRoomUid({ userUid }));
+      this.store.dispatch(updateIsLogin({ userUid, isLogin: false }));
       this.store.dispatch(playerLeaveRoom());
-    })
+    });
   }
 
   constructor(
@@ -101,7 +101,6 @@ export class AppComponent implements OnInit {
     private periodicTableService: PeriodicTableService,
     private serializer: UrlSerializer,
     private clipboard: Clipboard,
-
     private store: Store<State>
   ) {}
 
@@ -110,7 +109,7 @@ export class AppComponent implements OnInit {
     this.store.dispatch(getLoginUser({ roomUid }));
 
     //listen for room removed when host leave a room
-    this.store.dispatch(listenRoomRemoved())
+    this.store.dispatch(listenRoomRemoved());
   }
 
   handleFinish() {
@@ -143,7 +142,7 @@ export class AppComponent implements OnInit {
           });
 
           this.clipboard.copy(
-            `http://localhost:4200${this.serializer.serialize(tree)}`
+            `https://chemgame.pl${this.serializer.serialize(tree)}`
           );
           this.snackBarService.openSnackBar("Send this link to your friend");
         })

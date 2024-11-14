@@ -1,2 +1,35 @@
 /* You can add global styles to this file, and also import other style files */
 @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+/* defaut browser has margin */
+body {
+    margin: 0;
+    width: 100vw;
+    height: 100dvh;
+}
+
+@media all and (orientation: portrait) {  
+    body {
+      transform: rotate(-90deg);
+      /* width: 100dvh; */
+      /* height: 100vw; */
+      /* transform-origin: left top;
+      width: 100vh;
+      overflow-y: hidden;
+      position: absolute;
+      top: 100%;
+      left: 0; */
+    }
+  }
+
+  /* @media all and (orientation: portrait) {
+    body {
+        -webkit-transform: rotate(90deg); 
+        -moz-transform: rotate(90deg); 
+        -ms-transform: rotate(90deg); 
+        -o-transform: rotate(90deg); 
+        transform: rotate(90deg); 
+        transform-origin: left top;
+
+    }
+} */

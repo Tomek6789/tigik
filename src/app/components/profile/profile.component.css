@@ -1,8 +1,8 @@
 img {
-    height: 40px;
-    width: 40px;
+    /* height: 40px; */
+    /* width: 40px; */
     border-radius: 50%;
-    margin-right: 7px;
+    /* margin-right: 7px; */
 }
 
 .flex {
@@ -15,14 +15,14 @@ img {
 }
 
 .profile-icon {
-    height: 40px;
-    width: 40px;
-    font-size: 40px
+    /* height: 40px; */
+    /* width: 40px; */
+    /* font-size: 40px */
 }
 
 .winner {
-    width: 100px;
-    height: 24px;
+    /* width: 100px; */
+    /* height: 24px; */
     border-radius: 2px;
 }
 

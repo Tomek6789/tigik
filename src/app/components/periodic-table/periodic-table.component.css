@@ -1,52 +1,32 @@
 .periodicTable {
+  height: 100%;
+  width: 100%;
   display: grid;
+  overflow: hidden;
   grid-template-columns: repeat(18, 1fr);
   grid-template-rows: repeat(11, 1fr);
-  margin: 0 2%;
-}
-
-.color {
-  background-color: #e93838 !important;
 }
 
 .tada {
   background-color: #FCC585 !important;
 }
 
-.find {
-  grid-column: 7/10;
-  grid-row: 1/3;
-  font-size: 40px;
-  text-align: center;
-  background-color: lightskyblue;
-  border: 2px solid blue;
-  height: 60px;
-  line-height: 60px;
-  border-radius: 20px;
-  box-shadow: 0 0 0 3px white, 0 0 0 6px blue;
+.menu-panel {
+  grid-column: 3/13;
+  grid-row: 1/4;
 }
 
 .box {
   box-sizing: border-box;
   font-weight: bold;
-  text-align: center;
   border: 1px solid #777;
-  height: 6vh;
-  line-height: 6vh;
-  font-size: 18px;
+  font-size: 3vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .box:hover {
   cursor: pointer;
-}
-@media (max-width: 840px) {
-  .box {
-    font-size: 12px;
-  }
-}
-@media (max-width: 840px) {
-  .box:hover {
-    font-size: 14px;
-  }
 }
 
 .element-H {
