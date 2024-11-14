@@ -11,25 +11,12 @@ body {
 @media all and (orientation: portrait) {  
     body {
       transform: rotate(-90deg);
-      /* width: 100dvh; */
-      /* height: 100vw; */
-      /* transform-origin: left top;
-      width: 100vh;
+      transform-origin: left top;
+       width: 100dvh; 
+       height: 100vw; 
       overflow-y: hidden;
       position: absolute;
       top: 100%;
-      left: 0; */
+      left: 0; 
     }
   }
-
-  /* @media all and (orientation: portrait) {
-    body {
-        -webkit-transform: rotate(90deg); 
-        -moz-transform: rotate(90deg); 
-        -ms-transform: rotate(90deg); 
-        -o-transform: rotate(90deg); 
-        transform: rotate(90deg); 
-        transform-origin: left top;
-
-    }
-} */

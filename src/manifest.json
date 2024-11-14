@@ -1,7 +1,0 @@
-{
-    "name": "chem game",
-    "display":      "standalone", 
-    "orientation":  "landscape",
-    "background_color": "red",
-    "start_url": "index.html"
-}
