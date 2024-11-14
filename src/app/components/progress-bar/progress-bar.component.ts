@@ -16,7 +16,7 @@ export class ProgressBarComponent implements OnInit {
   @Input() reset$: Observable<boolean>;
   @Input() singlePlayerMode$: Observable<boolean>;
 
-  @Output() finish: EventEmitter<boolean> = new EventEmitter();
+  @Output() finish: EventEmitter<void> = new EventEmitter();
 
   ngOnInit() {
     this.show$ = this.reset$.pipe(map((v) => v));
@@ -25,7 +25,7 @@ export class ProgressBarComponent implements OnInit {
       take(101),
       tap((x) => {
         if (x === 100) {
-          this.finish.emit(false);
+          this.finish.emit();
         }
       })
     );

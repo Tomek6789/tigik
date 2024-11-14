@@ -1,11 +1,10 @@
-<mat-progress-bar
-  *ngIf="show$ | async; else temp"
-  [color]="color"
-  [mode]="mode"
-  [value]="value$ | async"
->
-</mat-progress-bar>
- 
-<ng-template #temp>
-  <div class="temp"></div>
-</ng-template>
+<div class="bar">
+  <mat-progress-bar
+    *ngIf="show$ | async"
+    [color]="color"
+    [mode]="mode"
+    [value]="value$ | async"
+  >
+  </mat-progress-bar>
+</div>
+

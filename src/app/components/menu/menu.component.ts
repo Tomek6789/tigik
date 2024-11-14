@@ -26,5 +26,4 @@ export class MenuComponent {
   onInvite() {
     this.invite.emit()
   }
-
 }

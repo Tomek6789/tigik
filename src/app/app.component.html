@@ -1,32 +1,34 @@
 
-        <app-progress-bar 
-            [singlePlayerMode$]="isSinglePlayerMode$"
-            [reset$]="resetProgressBar$"
-            (finish)="handleFinish($event)"
-        >
-        </app-progress-bar>
-        <app-menu 
-            [isStartGame]="startGame$ | async" 
-            [isLogin]="isLogin$ | async" 
-            [searchingElement]="searchingElementChanged$ | async"
-            [showInvite]="showInvite$ | async"
-            (startGame)="startGame()" 
-            (signIn)="onSingIn()" 
-            (invite)="onInvitePlayer()">
 
-            <app-profile loggedUser *ngIf="isLogin$ | async"
-                [winnerUid]="winnerUid$ | async"
-                [user]="user$ | async" 
-                (signOut)="onSignOut()">
-            </app-profile>
-            <app-profile opponentUser [winnerUid]="winnerUid$ | async" [showLogout]="false" [user]="opponentPlayer$ | async"></app-profile>
 
-        </app-menu>
+<app-periodic-table 
+[isStartGame]="startGame$ | async" 
+[table]="table$ | async"
+[searchingElement]="searchingElementChanged$ | async"
+[animate]="animate$ | async"
+(selected)="handleSelected($event)"
+>
 
-        <app-periodic-table 
-            [isStartGame]="startGame$ | async" 
-            [table]="table$ | async"
-            [searchingElement]="searchingElementChanged$ | async"
-            [animate]="animate$ | async"
-            (selected)="handleSelected($event)"></app-periodic-table>
+    <app-menu 
+    [isStartGame]="startGame$ | async" 
+    [isLogin]="isLogin$ | async" 
+    [searchingElement]="searchingElementChanged$ | async"
+    [showInvite]="showInvite$ | async"
+    (startGame)="startGame()" 
+    (signIn)="onSingIn()" 
+    (invite)="onInvitePlayer()">
 
+        <app-profile loggedUser *ngIf="isLogin$ | async"
+        [winnerUid]="winnerUid$ | async"
+        [user]="user$ | async" 
+        (signOut)="onSignOut()">
+        </app-profile>
+        <app-profile opponentUser [winnerUid]="winnerUid$ | async" [showLogout]="false" [user]="opponentPlayer$ | async"></app-profile>
+    </app-menu>
+    <app-progress-bar 
+    [singlePlayerMode$]="isSinglePlayerMode$"
+    [reset$]="resetProgressBar$"
+    (finish)="handleFinish()"
+    >
+    </app-progress-bar>
+</app-periodic-table>

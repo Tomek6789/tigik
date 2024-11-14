@@ -1,5 +1,11 @@
 import { inject, Injectable } from "@angular/core";
-import { Auth, signInWithPopup,  signInAnonymously, GoogleAuthProvider, signOut,  } from "@angular/fire/auth";
+import {
+  Auth,
+  signInWithPopup,
+  signInAnonymously,
+  GoogleAuthProvider,
+  signOut,
+} from "@angular/fire/auth";
 import { Observable, Subject } from "rxjs";
 import { User } from "./user.model";
 
@@ -7,22 +13,21 @@ import { User } from "./user.model";
   providedIn: "root",
 })
 export class AuthService {
-
-  authStateChangedSubject = new Subject<string>()
-  authStateChanged$: Observable<string> = this.authStateChangedSubject.asObservable();
+  authStateChangedSubject = new Subject<string>();
+  authStateChanged$: Observable<string> =
+    this.authStateChangedSubject.asObservable();
 
   private auth: Auth = inject(Auth);
 
-  userCreated = false
+  userCreated = false;
 
   constructor() {
-    this.auth.onAuthStateChanged(user => {
-      console.log(user)
-      if(user) {
-        this.userCreated = true
+    this.auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.userCreated = true;
       }
-      this.authStateChangedSubject.next(user?.uid)
-    })
+      this.authStateChangedSubject.next(user?.uid);
+    });
   }
 
   async googleSignIn() {
@@ -30,12 +35,10 @@ export class AuthService {
 
     try {
       return await signInWithPopup(this.auth, provider);
-      
     } catch (error) {
       // omit error when popup is close by user
     }
   }
-
 
   async signOut() {
     return await signOut(this.auth);

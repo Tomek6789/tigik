@@ -2,9 +2,7 @@
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-  height: 94px;
-  background-color: #FCC585;
-  margin-bottom: 15px;
+  height: 100%;
 }
 
 button {

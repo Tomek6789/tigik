@@ -53,7 +53,6 @@ import { connectAuthEmulator, getAuth } from "@firebase/auth";
 import { UserEffects } from "./store/user/user.effects";
 import { RoomEffects } from "./store/room/room.effects";
 import { getFunctions, provideFunctions } from "@angular/fire/functions";
-import { connectFunctionsEmulator } from "@firebase/functions";
 
 export interface AppState {
   [usersFeatureKey]: UserState;
@@ -103,7 +102,6 @@ export interface AppState {
     MatIconModule,
     MatTooltipModule,
     MatRippleModule,
-
     ClipboardModule,
     AuthModule,
     StoreModule.forRoot(
