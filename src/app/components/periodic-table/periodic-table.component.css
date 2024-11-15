@@ -18,9 +18,9 @@
 
 .box {
   box-sizing: border-box;
-  font-weight: bold;
+  font-weight: 500;
   border: 1px solid #777;
-  font-size: 3vh;
+  font-size: 14px;
   display: flex;
   justify-content: center;
   align-items: center;
